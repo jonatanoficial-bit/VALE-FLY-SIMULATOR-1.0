@@ -1,1 +1,115 @@
-<html><body><h1>FlySim 2026 - Parte 6</h1><p>Release Candidate</p></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VALE-FLY-SIMULATOR 1.0</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#020617" />
+  <link rel="icon" href="assets/images/logo.png" />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <header id="topbar">
+    <div class="brand">
+      <img src="assets/images/logo.png" alt="Logo" />
+      <div>
+        <div class="title">VALE-FLY-SIMULATOR</div>
+        <div class="subtitle">FlySim 2026 • Build Comercial (Fix GitHub Pages)</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button id="btnInstall" class="btn ghost" title="Instalar (PWA)">Instalar</button>
+      <button id="menuBtn" class="btn">☰</button>
+    </div>
+  </header>
+
+  <main id="map"></main>
+
+  <aside id="panel" aria-hidden="true">
+    <div class="tabs">
+      <button class="tab active" data-tab="overview">Visão geral</button>
+      <button class="tab" data-tab="routes">Rotas</button>
+      <button class="tab" data-tab="fleet">Frota</button>
+      <button class="tab" data-tab="saves">Save</button>
+    </div>
+
+    <section id="tab_overview" class="tabpage">
+      <div class="cards">
+        <div class="card"><div class="label">Dia</div><div class="value" id="clockText">—</div></div>
+        <div class="card"><div class="label">Caixa</div><div class="value" id="cashText">—</div></div>
+        <div class="card"><div class="label">Reputação</div><div class="value" id="repText">—</div></div>
+      </div>
+      <div class="row">
+        <button id="advanceDayBtn" class="btn primary">Avançar dia</button>
+        <button id="resetBtn" class="btn danger">Reset</button>
+      </div>
+      <div class="log" id="lastDayLog"></div>
+    </section>
+
+    <section id="tab_routes" class="tabpage hidden">
+      <div class="card">
+        <h3>Criar rota</h3>
+        <div class="grid">
+          <label>Origem</label>
+          <select id="routeFrom"></select>
+          <label>Destino</label>
+          <select id="routeTo"></select>
+          <label>Preço (R$)</label>
+          <input id="routePrice" type="number" min="50" step="10" value="500" />
+          <label>Voos/dia</label>
+          <input id="routeFreq" type="number" min="1" max="12" value="1" />
+          <label>Aeronave</label>
+          <select id="routeAircraft"></select>
+        </div>
+        <button id="addRouteBtn" class="btn primary">Adicionar rota</button>
+      </div>
+      <div class="card">
+        <h3>Rotas ativas</h3>
+        <div id="routesList" class="list muted">Nenhuma rota.</div>
+      </div>
+    </section>
+
+    <section id="tab_fleet" class="tabpage hidden">
+      <div class="card">
+        <h3>Comprar aeronave</h3>
+        <div class="grid">
+          <label>Modelo</label>
+          <select id="buyModel"></select>
+          <label>Nome (opcional)</label>
+          <input id="buyName" placeholder="Ex: PR-VALE" />
+        </div>
+        <button id="buyBtn" class="btn primary">Comprar</button>
+      </div>
+      <div class="card">
+        <h3>Sua frota</h3>
+        <div id="fleetList" class="list muted">Sem aeronaves.</div>
+      </div>
+    </section>
+
+    <section id="tab_saves" class="tabpage hidden">
+      <div class="card">
+        <h3>Backup do save</h3>
+        <div class="row">
+          <button id="exportBtn" class="btn">Exportar save</button>
+          <label class="btn ghost" for="importFile">Importar save</label>
+          <input id="importFile" type="file" accept="application/json" />
+        </div>
+        <p class="muted">Exportar/Importar é o jeito mais seguro de mover o progresso entre PC e celular.</p>
+      </div>
+    </section>
+  </aside>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script src="js/store.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/economy.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/bootstrap.js"></script>
+</body>
+</html>
