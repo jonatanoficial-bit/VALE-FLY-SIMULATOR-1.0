@@ -1,0 +1,23 @@
+
+{
+  "campaigns": [
+    {
+      "id": "startup_zero",
+      "name": "Do Zero ao Sucesso",
+      "description": "Comece com capital mínimo e construa uma companhia global.",
+      "goals": ["Lucro mensal positivo", "5 rotas ativas", "Reputação 70%"]
+    },
+    {
+      "id": "global_crisis",
+      "name": "Crise Econômica Mundial",
+      "description": "Gerencie sua empresa durante uma crise severa.",
+      "goals": ["Sobreviver 180 dias", "Manter caixa positivo"]
+    },
+    {
+      "id": "regional_to_global",
+      "name": "Regional para Global",
+      "description": "Expanda de voos regionais para intercontinentais.",
+      "goals": ["Abrir hub internacional", "Operar widebody"]
+    }
+  ]
+}
