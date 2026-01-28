@@ -1,9 +1,0 @@
-{
-  "name": "FlySim 2026 (Offline)",
-  "short_name": "FlySim",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#020617",
-  "theme_color": "#020617",
-  "icons": []
-}
