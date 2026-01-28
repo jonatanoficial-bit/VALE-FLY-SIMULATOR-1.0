@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FlySim 2026</title>
+<style>
+html,body{margin:0;height:100%;background:#020617;color:#fff;font-family:system-ui;overflow:hidden}
+
+#topbar{position:fixed;top:0;left:0;right:0;height:56px;background:#020617ee;backdrop-filter: blur(6px);display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:10}
+#topbar b{display:flex;align-items:center;gap:10px}
+#topbar img{height:26px;width:26px;border-radius:8px}
+
+#mapWrap{position:fixed;top:56px;left:0;right:0;bottom:0}
+#mapCanvas{width:100%;height:100%;touch-action:none;display:block}
+
+.btn{padding:10px 12px;border-radius:12px;border:0;background:#ffffff12;color:#fff;font-weight:600}
+.btn:hover{background:#ffffff18}
+.btn.primary{background:#38bdf8;color:#001018}
+.btn.danger{background:#ef4444}
+.btn.icon{width:44px;height:44px;display:grid;place-items:center}
+
+#drawer{position:fixed;top:56px;right:0;bottom:0;width:min(420px,100%);background:#0f172a;transform:translateX(100%);transition:.25s;z-index:20;display:flex;flex-direction:column;border-left:1px solid #ffffff12}
+#drawer.show{transform:translateX(0)}
+#drawerHeader{display:flex;align-items:center;justify-content:space-between;padding:12px 12px 6px 12px;gap:12px}
+#drawerHeader .meta{opacity:.9;font-size:12px}
+
+#statsBar{display:flex;gap:10px;padding:0 12px 10px 12px}
+.pill{background:#ffffff12;border:1px solid #ffffff10;padding:8px 10px;border-radius:999px;font-size:12px}
+
+#tabs{display:flex;gap:8px;padding:0 12px 12px 12px;flex-wrap:wrap}
+.tabBtn{padding:8px 10px;border-radius:999px;border:1px solid #ffffff12;background:#ffffff0b;color:#fff;font-weight:700;font-size:12px}
+.tabBtn.active{background:#38bdf8;color:#001018;border-color:#38bdf8}
+
+#drawerBody{padding:0 12px 14px 12px;overflow:auto}
+.card{background:#ffffff0d;border:1px solid #ffffff10;border-radius:16px;padding:12px;margin-bottom:12px}
+.card h3{margin:0 0 8px 0;font-size:14px;opacity:.95}
+.grid{display:grid;gap:10px}
+.grid.two{grid-template-columns:1fr 1fr}
+.field label{display:block;font-size:12px;opacity:.85;margin-bottom:6px}
+.field input,.field select{width:100%;box-sizing:border-box;padding:10px;border-radius:12px;border:1px solid #ffffff12;background:#020617;color:#fff}
+.hint{opacity:.75;font-size:13px;line-height:1.4}
+
+.tab{display:none}
+.tab.active{display:block}
+
+.rowCard{background:#ffffff0b;border:1px solid #ffffff10;border-radius:14px;padding:10px;margin-bottom:10px}
+.rowMain{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.rowTitle{font-weight:800;font-size:13px}
+.rowSub{opacity:.8;font-size:12px;margin-top:2px}
+.rowRight{text-align:right}
+.rowMoney{font-weight:900;font-size:13px;margin-top:6px}
+.rowMoney.good{color:#86efac}
+.rowMoney.bad{color:#fca5a5}
+.rowMeta{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;opacity:.9;font-size:12px}
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800}
+.badge.on{background:#22c55e33;color:#86efac;border:1px solid #22c55e55}
+.badge.off{background:#ef444433;color:#fecaca;border:1px solid #ef444455}
+
+#toast{position:fixed;left:50%;bottom:14px;transform:translateX(-50%) translateY(30px);opacity:0;transition:.25s;z-index:30;background:#ffffff14;border:1px solid #ffffff20;border-radius:999px;padding:10px 14px;font-weight:700;font-size:13px;backdrop-filter: blur(8px)}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+</style>
+</head>
+<body>
+<div id="topbar">
+ <b><img src="assets/images/plane.png" alt=""/> <span id="titleCompany">FlySim 2026</span></b>
+ <button class="btn icon" id="menuBtn" title="Menu">☰</button>
+</div>
+
+<div id="mapWrap">
+  <canvas id="mapCanvas"></canvas>
+</div>
+
+<div id="drawer" aria-label="Menu">
+  <div id="drawerHeader">
+    <div>
+      <div style="font-weight:900;font-size:14px">Painel da Companhia</div>
+      <div class="meta" id="clockText">Dia 1</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn primary" id="advanceDayBtn">Avançar dia</button>
+      <button class="btn icon" id="closeDrawerBtn" title="Fechar">✕</button>
+    </div>
+  </div>
+
+  <div id="statsBar">
+    <div class="pill">Caixa: <b id="cashText">—</b></div>
+    <div class="pill">Reputação: <b id="repText">—</b></div>
+  </div>
+
+  <div id="tabs">
+    <button class="tabBtn active" data-tab="overview">Visão geral</button>
+    <button class="tabBtn" data-tab="routes">Rotas</button>
+    <button class="tabBtn" data-tab="fleet">Frota</button>
+    <button class="tabBtn" data-tab="staff">Equipe</button>
+    <button class="tabBtn" data-tab="finance">Finanças</button>
+    <button class="tabBtn" data-tab="map">Mapa</button>
+    <button class="tabBtn" data-tab="settings">Config</button>
+  </div>
+
+  <div id="drawerBody">
+    <div class="tab active" id="tab_overview">
+      <div class="card">
+        <h3>Resumo</h3>
+        <div class="grid two">
+          <div class="pill">Passageiros: <b id="statPax">0</b></div>
+          <div class="pill">Voos: <b id="statFlights">0</b></div>
+          <div class="pill">Receita: <b id="statRev">—</b></div>
+          <div class="pill">Custos: <b id="statCost">—</b></div>
+          <div class="pill">Salários: <b id="statWages">—</b></div>
+          <div class="pill">Manutenção: <b id="statMaint">—</b></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Dica rápida</h3>
+        <div class="hint">Crie rotas com passagem e frequência equilibradas. Depois avance o dia para ver o lucro. O mapa mostra suas rotas ativas.</div>
+      </div>
+    </div>
+
+    <div class="tab" id="tab_routes">
+      <div class="card">
+        <h3>Criar rota</h3>
+        <div class="grid two">
+          <div class="field">
+            <label>Origem</label>
+            <select id="routeFrom"></select>
+          </div>
+          <div class="field">
+            <label>Destino</label>
+            <select id="routeTo"></select>
+          </div>
+        </div>
+        <div class="grid two" style="margin-top:10px">
+          <div class="field">
+            <label>Passagem (BRL)</label>
+            <input id="routeTicket" type="number" value="650" min="50" step="10"/>
+          </div>
+          <div class="field">
+            <label>Voos por dia</label>
+            <input id="routeFreq" type="number" value="1" min="1" max="10" step="1"/>
+          </div>
+        </div>
+        <div class="grid" style="margin-top:10px">
+          <div class="field">
+            <label>Aeronave</label>
+            <select id="routePlane"></select>
+          </div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:10px">
+          <button class="btn primary" id="createRouteBtn">Criar rota</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Rotas</h3>
+        <div id="routesList"></div>
+      
+    <div class="tab" id="tab_fleet">
+      <div class="card">
+        <h3>Comprar aeronave</h3>
+        <div class="grid">
+          <div class="field">
+            <label>Modelo</label>
+            <select id="buyModel"></select>
+          </div>
+          <div class="field">
+            <label>Nome (opcional)</label>
+            <input id="buyName" type="text" placeholder="Ex: Frota 02" maxlength="24"/>
+          </div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn primary" id="buyPlaneBtn">Comprar</button>
+        </div>
+        <div class="hint" style="margin-top:10px">Dica: cada rota precisa de uma aeronave alocada. Conserte a frota antes de cair muito a condição.</div>
+      </div>
+
+      <div class="card">
+        <h3>Frota</h3>
+        <div id="fleetList"></div>
+      </div>
+    </div>
+
+    <div class="tab" id="tab_staff">
+      <div class="card">
+        <h3>Equipe</h3>
+        <div class="hint">No Part 2, a equipe é agregada. Se faltar tripulação, você terá menos voos e perde reputação.</div>
+        <div class="grid two" style="margin-top:10px">
+          <div class="rowCard">
+            <div class="rowMain">
+              <div>
+                <div class="rowTitle">Pilotos</div>
+                <div class="rowSub">Necessário: 2 por aeronave ativa</div>
+              </div>
+              <div class="rowRight">
+                <div class="rowMoney" id="staffPilots">0</div>
+              </div>
+            </div>
+            <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn" id="hirePilotsBtn">+1</button>
+              <button class="btn danger" id="firePilotsBtn">-1</button>
+            </div>
+          </div>
+
+          <div class="rowCard">
+            <div class="rowMain">
+              <div>
+                <div class="rowTitle">Comissários</div>
+                <div class="rowSub">Escala por capacidade do avião</div>
+              </div>
+              <div class="rowRight">
+                <div class="rowMoney" id="staffCabin">0</div>
+              </div>
+            </div>
+            <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn" id="hireCabinBtn">+2</button>
+              <button class="btn danger" id="fireCabinBtn">-2</button>
+            </div>
+          </div>
+
+          <div class="rowCard">
+            <div class="rowMain">
+              <div>
+                <div class="rowTitle">Mecânicos</div>
+                <div class="rowSub">Ajuda a manter operações saudáveis</div>
+              </div>
+              <div class="rowRight">
+                <div class="rowMoney" id="staffMech">0</div>
+              </div>
+            </div>
+            <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn" id="hireMechBtn">+1</button>
+              <button class="btn danger" id="fireMechBtn">-1</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="tab" id="tab_finance">
+      <div class="card">
+        <h3>Últimos dias</h3>
+        <div id="financeList"></div>
+      </div>
+    </div>
+
+    
+    <div class="tab" id="tab_map">
+      <div class="card">
+        <h3>Mapa realista (offline por cache)</h3>
+        <div class="rowSub" style="margin-top:-6px">Quando online, você pode baixar um pacote de tiles e depois jogar offline com o mapa real.</div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px">
+          <button class="btn" id="toggleTilesBtn">Ativar mapa realista</button>
+          <span class="pill" id="mapModePill">Modo: Offline básico</span>
+        </div>
+
+        <div class="grid two" style="margin-top:12px">
+          <label class="field">
+            <span>Região (pacote)</span>
+            <select id="mapPackSelect" class="input">
+              <option value="world_low">Mundo (zoom 1–3) • leve</option>
+              <option value="south_america">América do Sul (zoom 2–6)</option>
+              <option value="brazil">Brasil (zoom 3–7)</option>
+              <option value="europe">Europa (zoom 3–7)</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Qualidade</span>
+            <select id="mapPackQuality" class="input">
+              <option value="lite">Leve (menos zoom)</option>
+              <option value="std" selected>Padrão</option>
+              <option value="hq">Alta (mais zoom)</option>
+            </select>
+          </label>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+          <button class="btn primary" id="downloadPackBtn">Baixar pacote</button>
+          <button class="btn" id="cancelPackBtn" disabled>Cancelar</button>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="rowMain" style="align-items:center;gap:12px">
+            <div style="flex:1">
+              <div class="rowTitle">Progresso</div>
+              <div class="rowSub" id="packProgressText">Nenhum download em andamento.</div>
+            </div>
+            <div class="badge on" id="packProgressBadge" style="display:none">Baixando</div>
+          </div>
+          <div style="margin-top:10px">
+            <div style="height:10px;border-radius:999px;background:#ffffff12;overflow:hidden">
+              <div id="packProgressBar" style="height:10px;width:0%;background:#38bdf8"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rowSub" style="margin-top:10px;opacity:.85">
+          Dica: depois de baixar, coloque o celular em modo avião e teste o mapa realista offline.
+        </div>
+      </div>
+    </div>
+
+<div class="tab" id="tab_settings">
+      <div class="card">
+        <h3>Companhia</h3>
+        <div class="field">
+          <label>Nome</label>
+          <input id="companyName" type="text" value="Sua Companhia" maxlength="32"/>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Salvar / Carregar</h3>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn" id="exportBtn">Exportar save (JSON)</button>
+          <label class="btn" for="importFile" style="cursor:pointer">Importar save</label>
+          <input id="importFile" type="file" accept="application/json" style="display:none"/>
+        </div>
+        <div class="hint" style="margin-top:10px">O jogo salva automaticamente no seu dispositivo. Exportar/Importar serve para backup e troca entre PC e celular.</div>
+      </div>
+
+      <div class="card">
+        <h3>Reset</h3>
+        <button class="btn danger" id="resetBtn">Resetar jogo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="js/store.js"></script>
+<script src="js/airports.js"></script>
+<script src="js/aircraft.js"></script>
+<script src="js/state.js"></script>
+<script src="js/economy.js"></script>
+<script src="js/map_canvas.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

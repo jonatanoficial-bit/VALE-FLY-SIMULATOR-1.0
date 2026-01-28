@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>FlySim Offline</title>
+  <link rel="stylesheet" href="css/style.css"/>
+
+  <!-- PWA (offline after install) -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0b1420">
+</head>
+<body>
+  <header class="header">
+    <div class="brand">
+      <img src="assets/images/logo.png" alt="Logo" class="logo"/>
+      <div class="brandText">
+        <div class="brandTitle">FlySim</div>
+        <div class="brandSub">Offline Airline & Flight Manager</div>
+      </div>
+    </div>
+    <div class="headerRight">
+      <button id="tutorialBtn" class="pillBtn" type="button">Tutorial</button>
+      <button id="menuBtn" class="menuBtn" type="button" aria-label="Menu">☰</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- MAPA OFFLINE (Canvas) -->
+    <section class="mapWrap">
+      <div class="mapTopBar">
+        <div class="mapStatus">
+          <span class="dot"></span>
+          <span id="mapStatusText">Offline • Mapa tático</span>
+        </div>
+        <div class="mapHint" id="mapHint">Toque em uma rota/avião para detalhes</div>
+      </div>
+      <div id="mapStage" class="mapStage">
+        <canvas id="mapCanvas"></canvas>
+        <div id="mapLoading" class="mapLoading">Carregando mapa…</div>
+      </div>
+    </section>
+
+    <!-- PAINEL -->
+    <aside id="sidePanel" class="sidePanel">
+      <nav class="tabs">
+        <button class="tabBtn active" data-tab="overview" id="overviewTab" type="button">Painel</button>
+        <button class="tabBtn" data-tab="fleet" id="fleetTab" type="button">Frota</button>
+        <button class="tabBtn" data-tab="routes" id="routesTab" type="button">Rotas</button>
+        <button class="tabBtn" data-tab="flights" id="flightsTab" type="button">Voos</button>
+        <button class="tabBtn" data-tab="staff" id="staffTab" type="button">Equipe</button>
+        <button class="tabBtn" data-tab="missions" id="missionsTab" type="button">Missões</button>
+        <button class="tabBtn" data-tab="career" id="careerTab" type="button">Carreira</button>
+        <button class="tabBtn" data-tab="settings" id="settingsTab" type="button">Config</button>
+      </nav>
+      <section id="tabContent" class="tabContent"></section>
+    </aside>
+  </main>
+
+  <!-- TUTORIAL OVERLAY -->
+  <div id="tutorialOverlay" class="tutorialOverlay hidden" role="dialog" aria-modal="true">
+    <div class="tutorialCard">
+      <div class="tutorialHeader">
+        <div class="tutorialTitle">Tutorial rápido (≈5 min)</div>
+        <button id="tutorialClose" class="iconBtn" type="button" aria-label="Fechar">✕</button>
+      </div>
+      <div id="tutorialBody" class="tutorialBody"></div>
+      <div class="tutorialFooter">
+        <button id="tutorialPrev" class="pillBtn" type="button">Voltar</button>
+        <div id="tutorialStep" class="tutorialStep"></div>
+        <button id="tutorialNext" class="pillBtn primary" type="button">Próximo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    // Registrar service worker (offline after first load / install)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
