@@ -1,0 +1,1 @@
+export const LANGS = ['pt','en','es'];
