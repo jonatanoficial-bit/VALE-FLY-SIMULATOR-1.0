@@ -26,3 +26,7 @@
   // Initial render
   window.dispatchEvent(new Event('game-updated'));
 })();
+
+try{ window.ProgressionModule?.ensure?.(window.gameState); window.HubsModule?.ensure?.(window.gameState);}catch(_){}
+
+try{ window.RnDModule?.ensure?.(window.gameState); window.MarketingModule?.ensure?.(window.gameState); window.AlliancesModule?.ensure?.(window.gameState);}catch(e){}

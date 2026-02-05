@@ -7,7 +7,7 @@ const CORE_ASSETS = [
   "./js/data.js",
   "./js/economy.js",
   "./js/map.js",
-  "./js/ui.js",
+  "./js/ui.js','js/hubs.js','js/progression.js','js/alliances.js','js/marketing.js','js/rnd.js",
   "./js/game.js",
   "./js/bootstrap.js",
   "./assets/images/logo.png",

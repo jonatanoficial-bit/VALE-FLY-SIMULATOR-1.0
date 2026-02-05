@@ -23,15 +23,13 @@ window.UIModule = (() => {
     // Day advance
     document.getElementById("advanceDayBtn").onclick = () => {
       const res = EconomyModule.advanceDay(window.gameState);
-      window.gameState.company.day++;
-      window.gameState.company.cash += res.profit;
-      // Reputação simples: sobe com lucro, desce com prejuízo
-      const deltaRep = Math.max(-0.02, Math.min(0.02, res.profit / 3000000000));
-      window.gameState.company.reputation01 = Math.max(0.05, Math.min(0.95, window.gameState.company.reputation01 + deltaRep));
-      window.gameState.lastDay = res;
       FlySimStore.save(window.gameState);
       render();
       MapModule.render();
+      // feedback rápido
+      if(res?.notes?.length){
+        console.log("Notas do dia:", res.notes);
+      }
     };
 
     document.getElementById("resetBtn").onclick = () => {
@@ -53,6 +51,15 @@ window.UIModule = (() => {
       if(!from || !to || from===to) return alert("Escolha origem e destino diferentes.");
       if(!aircraftId) return alert("Escolha uma aeronave.");
       if(price < 50) return alert("Preço muito baixo.");
+
+      const ac = window.gameState.fleet.find(a=>a.id===aircraftId);
+      const model = window.gameState.aircraftCatalog.find(m=>m.modelId===ac?.modelId);
+      if(!ac || !model) return alert("Aeronave inválida.");
+      const dist = EconomyModule.distanceKm(window.gameState, from, to);
+      if(dist <= 0) return alert("Distância inválida.");
+      if(dist > model.rangeKm){
+        return alert(`Essa rota tem ~${Math.round(dist)} km e excede o alcance do ${model.name} (${model.rangeKm} km).`);
+      }
 
       // valida se aeronave já está alocada em outra rota ativa
       const busy = window.gameState.routes.some(r => r.active && r.aircraftId === aircraftId);
@@ -84,7 +91,78 @@ window.UIModule = (() => {
       setTab("fleet");
     };
 
-    // Export/Import
+// HUBs
+const createHubBtn = document.getElementById("createHubBtn");
+if(createHubBtn){
+  createHubBtn.onclick = () => {
+    const code = document.getElementById("hubAirport").value;
+    try{
+      window.HubsModule.createHub(window.gameState, code);
+      FlySimStore.save(window.gameState);
+      render();
+      MapModule.render();
+      alert(`HUB criado em ${code}!`);
+    }catch(err){
+      alert(err.message);
+    }
+  };
+}
+
+    // P&D / Marketing / Alianças
+const buyTechBtn = document.getElementById("buyTechBtn");
+if(buyTechBtn){
+  buyTechBtn.onclick = () => {
+    const id = document.getElementById("techSelect").value;
+    try{
+      window.RnDModule.buyTech(window.gameState, id);
+      FlySimStore.save(window.gameState);
+      render();
+      alert("Tecnologia pesquisada!");
+    }catch(err){ alert(err.message); }
+  };
+}
+
+const setMarketingBtn = document.getElementById("setMarketingBtn");
+if(setMarketingBtn){
+  setMarketingBtn.onclick = () => {
+    const v = Number(document.getElementById("marketingBudget").value || 0);
+    try{
+      window.MarketingModule.setDailyBudget(window.gameState, v);
+      FlySimStore.save(window.gameState);
+      render();
+      alert("Orçamento diário atualizado.");
+    }catch(err){ alert(err.message); }
+  };
+}
+
+const activateCampaignBtn = document.getElementById("activateCampaignBtn");
+if(activateCampaignBtn){
+  activateCampaignBtn.onclick = () => {
+    const id = document.getElementById("campaignSelect").value;
+    try{
+      window.MarketingModule.activate(window.gameState, id);
+      FlySimStore.save(window.gameState);
+      render();
+      alert("Campanha ativada!");
+    }catch(err){ alert(err.message); }
+  };
+}
+
+const buyAllianceBtn = document.getElementById("buyAllianceBtn");
+if(buyAllianceBtn){
+  buyAllianceBtn.onclick = () => {
+    const id = document.getElementById("allianceSelect").value;
+    try{
+      window.AlliancesModule.buy(window.gameState, id);
+      FlySimStore.save(window.gameState);
+      render();
+      alert("Acordo adquirido!");
+    }catch(err){ alert(err.message); }
+  };
+}
+
+// Export/Import
+
     document.getElementById("exportBtn").onclick = () => {
       const blob = new Blob([JSON.stringify(window.gameState, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
@@ -140,6 +218,11 @@ window.UIModule = (() => {
     document.getElementById("tab_routes").classList.toggle("hidden", tab!=="routes");
     document.getElementById("tab_fleet").classList.toggle("hidden", tab!=="fleet");
     document.getElementById("tab_saves").classList.toggle("hidden", tab!=="saves");
+    document.getElementById("tab_hubs").classList.toggle("hidden", tab!=="hubs");
+    document.getElementById("tab_career").classList.toggle("hidden", tab!=="career");
+    document.getElementById("tab_rnd").classList.toggle("hidden", tab!=="rnd");
+    document.getElementById("tab_marketing").classList.toggle("hidden", tab!=="marketing");
+    document.getElementById("tab_alliances").classList.toggle("hidden", tab!=="alliances");
   }
 
   function render(){
@@ -147,25 +230,40 @@ window.UIModule = (() => {
     document.getElementById("clockText").textContent = s.company.day;
     document.getElementById("cashText").textContent = money(s.company.cash);
     document.getElementById("repText").textContent = Math.round(s.company.reputation01*100) + "%";
+    if(document.getElementById("lvlText")){
+      const lv = s.progress?.level ?? 1;
+      const xp = s.progress?.xp ?? 0;
+      document.getElementById("lvlText").textContent = lv;
+      document.getElementById("xpText").textContent = xp;
+    }
 
-    const ld = s.lastDay;
+    const ld = s.lastDay || {revenue:0,costs:0,profit:0,canceled:0,notes:[]};
+    const notes = (ld.notes && ld.notes.length) ? ("
+" + ld.notes.map(n=>"• "+n).join("
+")) : "";
     document.getElementById("lastDayLog").textContent =
-      `Último dia:\n` +
-      `Receita: ${money(ld.revenue)}\n` +
-      `Custos:  ${money(ld.costs)}\n` +
-      `Lucro:  ${money(ld.profit)}\n` +
-      (ld.cancelledFlights ? `Cancelamentos: ${ld.cancelledFlights}\n` : "");
+      `Último dia:
+` +
+      `Receita: ${money(ld.revenue)}
+` +
+      `Custos:  ${money(ld.costs)}
+` +
+      `Lucro:  ${money(ld.profit)}
+` +
+      (ld.canceled ? `Cancelamentos: ${ld.canceled}
+` : "") +
+      notes; 
 
     // selects
-    const airports = s.airports.slice().sort((a,b)=>a.code.localeCompare(b.code));
+    const airports = (window.ProgressionModule?.getAvailableAirports?.(s) || s.airports).slice().sort((a,b)=>a.code.localeCompare(b.code));
     const setOptions = (sel, opts, valFn, labelFn) => {
       const cur = sel.value;
       sel.innerHTML = opts.map(o => `<option value="${valFn(o)}">${labelFn(o)}</option>`).join("");
       if(cur) sel.value = cur;
     };
 
-    setOptions(document.getElementById("routeFrom"), airports, a=>a.code, a=>`${a.code} — ${a.city}`);
-    setOptions(document.getElementById("routeTo"), airports, a=>a.code, a=>`${a.code} — ${a.city}`);
+    setOptions(document.getElementById("routeFrom"), airports, a=>a.code, a=>`${a.code} — ${a.city} (${a.country||""})`);
+    setOptions(document.getElementById("routeTo"), airports, a=>a.code, a=>`${a.code} — ${a.city} (${a.country||""})`);
 
     // fleet select for routes: only aircraft not in maintenance and not already assigned
     const freeFleet = s.fleet.filter(a => a.inMaintenanceDays<=0);
@@ -177,11 +275,17 @@ window.UIModule = (() => {
 
     // buy select
     const buyModel = document.getElementById("buyModel");
-    buyModel.innerHTML = s.aircraftCatalog.map(m => `<option value="${m.modelId}">${m.name} — ${money(m.price)}</option>`).join("");
+    const availModels = (window.ProgressionModule?.getAvailableModels?.(s) || s.aircraftCatalog);
+    buyModel.innerHTML = availModels.map(m => `<option value="${m.modelId}">${m.name} — ${money(m.price)}</option>`).join("");
 
     // lists
     renderRoutes();
     renderFleet();
+    renderHubs();
+    renderCareer();
+    renderRnD();
+    renderMarketing();
+    renderAlliances();
   }
 
   function renderRoutes(){
@@ -282,5 +386,139 @@ window.UIModule = (() => {
     });
   }
 
-  return { init, render };
+
+function renderHubs(){
+  const s = window.gameState;
+  const list = document.getElementById("hubsList");
+  const sel = document.getElementById("hubAirport");
+  if(!list || !sel) return;
+
+  // dropdown: apenas aeroportos desbloqueados
+  const airports = (window.ProgressionModule?.getAvailableAirports?.(s) || s.airports).slice().sort((a,b)=>a.code.localeCompare(b.code));
+  sel.innerHTML = airports.map(a=>`<option value="${a.code}">${a.code} — ${a.city} (${a.country||""})</option>`).join("");
+
+  const hubs = s.hubs || {};
+  const hubCodes = Object.keys(hubs);
+  if(hubCodes.length===0){
+    list.textContent = "Nenhum HUB.";
+    list.classList.add("muted");
+    return;
+  }
+  list.classList.remove("muted");
+  list.innerHTML = hubCodes.map(code=>{
+    const h = hubs[code];
+    const slots = window.HubsModule?.getSlotsForAirport?.(s, code) ?? "?";
+    const bonus = Math.round((h.demandBonus01||0)*100);
+    return `
+      <div class="item">
+        <div>
+          <div><b>${code}</b> <span class="muted">Nível ${h.level}</span></div>
+          <div class="meta">Slots/dia: ${slots} • Bônus demanda: +${bonus}%</div>
+        </div>
+        <div class="row">
+          <button class="btn" data-hub-up="${code}">Upgrade</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  list.querySelectorAll("[data-hub-up]").forEach(btn=>{
+    btn.onclick = () => {
+      const code = btn.getAttribute("data-hub-up");
+      try{
+        const res = window.HubsModule.upgradeHub(window.gameState, code);
+        FlySimStore.save(window.gameState);
+        render();
+        MapModule.render();
+        alert(`HUB ${code} melhorado! Custo: ${money(res.cost)}`);
+      }catch(err){
+        alert(err.message);
+      }
+    };
+  });
+}
+
+function renderCareer(){
+  const s = window.gameState;
+  const el = document.getElementById("careerBox");
+  if(!el) return;
+  const lv = s.progress?.level ?? 1;
+  const xp = s.progress?.xp ?? 0;
+  const tiers = (s.progress?.unlockedTiers || []).join(", ");
+  const hubs = Object.keys(s.hubs||{}).length;
+  const act = s.objectives?.activeId || "startup";
+  const done = s.objectives?.completed || {};
+  const status = done[act] ? "Concluído" : "Em andamento";
+
+  el.innerHTML = `
+    <div class="cards">
+      <div class="card"><div class="label">Nível</div><div class="value">${lv}</div></div>
+      <div class="card"><div class="label">XP</div><div class="value">${xp}</div></div>
+      <div class="card"><div class="label">HUBs</div><div class="value">${hubs}</div></div>
+    </div>
+    <p class="muted">Tiers desbloqueados: <b>${tiers || "mid"}</b></p>
+    <div class="card">
+      <h3>Objetivo atual</h3>
+      <p><b>${act}</b> — <span class="muted">${status}</span></p>
+      <p class="muted">Objetivos avançam automaticamente quando você cumpre as condições (rotas, frota, reputação, etc.).</p>
+      <div class="row">
+        <button id="setObjStartup" class="btn ghost">Startup</button>
+        <button id="setObjHub" class="btn ghost">HUB</button>
+        <button id="setObjGlobal" class="btn ghost">Global</button>
+      </div>
+    </div>
+  `;
+
+  el.querySelector("#setObjStartup").onclick = ()=>setObjective("startup");
+  el.querySelector("#setObjHub").onclick = ()=>setObjective("hub");
+  el.querySelector("#setObjGlobal").onclick = ()=>setObjective("global");
+}
+
+function setObjective(id){
+  window.gameState.objectives = window.gameState.objectives || {activeId:"startup", completed:{}};
+  window.gameState.objectives.activeId = id;
+  FlySimStore.save(window.gameState);
+  render();
+}
+
+function renderRnD(){
+  const s = window.gameState;
+  const box = document.getElementById("rndBox");
+  const sel = document.getElementById("techSelect");
+  if(!box || !sel) return;
+  try{ window.RnDModule.ensure(s); }catch(e){}
+  const techs = window.RnDModule?.listTechs?.() || [];
+  sel.innerHTML = techs.map(t=>`<option value="${t.id}">${t.name} — ${money(t.cost)}</option>`).join("");
+  const owned = Object.keys(s.rd?.owned||{}).length;
+  box.innerHTML = `Fuel ${(s.rd?.fuelMult||1).toFixed(2)}x • Manut ${(s.rd?.maintMult||1).toFixed(2)}x • Load +${Math.round((s.rd?.loadBonus01||0)*100)}% • Techs: <b>${owned}</b>`;
+}
+
+function renderMarketing(){
+  const s = window.gameState;
+  const box = document.getElementById("marketingBox");
+  const sel = document.getElementById("campaignSelect");
+  const budget = document.getElementById("marketingBudget");
+  if(!box || !sel || !budget) return;
+  try{ window.MarketingModule.ensure(s); }catch(e){}
+  const camps = window.MarketingModule?.list?.() || [];
+  sel.innerHTML = camps.map(c=>`<option value="${c.id}">${c.name}</option>`).join("");
+  budget.value = s.marketing?.dailyBudget || 0;
+  const active = Object.keys(s.marketing?.active||{}).length;
+  box.innerHTML = `Ativas: <b>${active}</b> • Bônus ocupação: +${Math.round((window.MarketingModule.getLoadBonus01(s)||0)*100)}%`;
+}
+
+function renderAlliances(){
+  const s = window.gameState;
+  const box = document.getElementById("alliancesBox");
+  const sel = document.getElementById("allianceSelect");
+  if(!box || !sel) return;
+  try{ window.AlliancesModule.ensure(s); }catch(e){}
+  const all = window.AlliancesModule?.list?.() || [];
+  sel.innerHTML = all.map(a=>`<option value="${a.id}">${a.name} — ${money(a.cost)}</option>`).join("");
+  const owned = Object.keys(s.alliances?.owned||{}).length;
+  box.innerHTML = `Intl +${Math.round((s.alliances?.intlLoadBonus01||0)*100)}% • Taxas ${(s.alliances?.airportFeeMult||1).toFixed(2)}x • Long ${(s.alliances?.longRevenueMult||1).toFixed(2)}x • Acordos: <b>${owned}</b>`;
+}
+
+return { init, render };
+
 })();
