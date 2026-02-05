@@ -1,4 +1,3 @@
-const CACHE_NAME = "vale-fly-sim-build_2026-02-05_hotfix1";
 const CACHE = "flysim-cache-v1";
 const CORE_ASSETS = [
   "./",
@@ -8,7 +7,7 @@ const CORE_ASSETS = [
   "./js/data.js",
   "./js/economy.js",
   "./js/map.js",
-  "./js/ui.js','js/hubs.js','js/progression.js','js/alliances.js','js/marketing.js','js/rnd.js",
+  "./js/ui.build_2026-02-05_hotfix2.js','js/hubs.js','js/progression.js','js/alliances.js','js/marketing.js','js/rnd.js",
   "./js/game.js",
   "./js/bootstrap.js",
   "./assets/images/logo.png",

@@ -1,6 +1,6 @@
 # Vale Fly Simulator 1.0
 
-**BUILD_2026-02-05_HOTFIX1**
+**BUILD_2026-02-05_HOTFIX2**
 
-Hotfix: corrige erro de sintaxe em ui.js (log do último dia) que impedia o carregamento do UIModule.
-Também versiona o cache do Service Worker para evitar página antiga no GitHub Pages.
+Hotfix2: corrige SyntaxError no UI e aplica cache-busting renomeando ui.js.
+Se você publicar este build, usuários não ficam presos em arquivos antigos.
