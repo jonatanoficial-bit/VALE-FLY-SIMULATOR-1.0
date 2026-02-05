@@ -1,0 +1,1 @@
+export function loadCampaign(id){ console.log('Campanha carregada:', id); }
