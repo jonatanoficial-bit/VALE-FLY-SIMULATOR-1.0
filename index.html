@@ -2,198 +2,78 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>VALE-FLY-SIMULATOR 1.0</title>
-  <link rel="manifest" href="manifest.webmanifest" />
-  <meta name="theme-color" content="#020617" />
-  <link rel="icon" href="assets/images/logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vale Futebol Manager 2026 - Premium</title>
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="css/app.css" />
+  <link rel="stylesheet" href="./styles.css?v=1.14.9" />
 </head>
 <body>
-  <header id="topbar">
-    <div class="brand">
-      <img src="assets/images/logo.png" alt="Logo" />
-      <div>
-        <div class="title">VALE-FLY-SIMULATOR</div>
-        <div class="subtitle">FlySim 2026 • Build Comercial (Fix GitHub Pages)</div>
-      </div>
+  <!-- Splash -->
+  <div class="splash" id="splash">
+    <div class="splash-logo">
+      <img src="./assets/images/vale_games_logo.png" alt="Vale Games" />
     </div>
-    <div class="top-actions">
-      <button id="btnInstall" class="btn ghost" title="Instalar (PWA)">Instalar</button>
-      <button id="menuBtn" class="btn">☰</button>
-    </div>
-  </header>
+  </div>
 
-  <main id="map"></main>
-
-  <aside id="panel" aria-hidden="true">
-    <div class="tabs">
-      <button class="tab active" data-tab="overview">Visão geral</button>
-      <button class="tab" data-tab="routes">Rotas</button>
-      <button class="tab" data-tab="fleet">Frota</button>
-      <button class="tab" data-tab="saves">Save</button>
-      <button class="tab" data-tab="hubs">HUBs</button>
-      <button class="tab" data-tab="career">Carreira</button>
-      <button class="tab" data-tab="rnd">P&amp;D</button>
-      <button class="tab" data-tab="marketing">Marketing</button>
-      <button class="tab" data-tab="alliances">Alianças</button>
-    </div>
-
-    <section id="tab_overview" class="tabpage">
-      <div class="cards">
-        <div class="card"><div class="label">Dia</div><div class="value" id="clockText">—</div></div>
-        <div class="card"><div class="label">Caixa</div><div class="value" id="cashText">—</div></div>
-        <div class="card"><div class="label">Reputação</div><div class="value" id="repText">—</div></div>
-        <div class="card"><div class="label">Nível</div><div class="value" id="lvlText">—</div></div>
-        <div class="card"><div class="label">XP</div><div class="value" id="xpText">—</div></div>
-      </div>
-      <div class="row">
-        <button id="advanceDayBtn" class="btn primary">Avançar dia</button>
-        <button id="resetBtn" class="btn danger">Reset</button>
-      </div>
-      <div class="log" id="lastDayLog"></div>
-    </section>
-
-    <section id="tab_routes" class="tabpage hidden">
-      <div class="card">
-        <h3>Criar rota</h3>
-        <div class="grid">
-          <label>Origem</label>
-          <select id="routeFrom"></select>
-          <label>Destino</label>
-          <select id="routeTo"></select>
-          <label>Preço (R$)</label>
-          <input id="routePrice" type="number" min="50" step="10" value="500" />
-          <label>Voos/dia</label>
-          <input id="routeFreq" type="number" min="1" max="12" value="1" />
-          <label>Aeronave</label>
-          <select id="routeAircraft"></select>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo-badge">VFM</div>
+        <div class="brand-text">
+          <div class="brand-title">Vale Futebol Manager 2026</div>
+          <div class="brand-subtitle">Carreira • Dados • Admin</div>
         </div>
-        <button id="addRouteBtn" class="btn primary">Adicionar rota</button>
       </div>
-      <div class="card">
-        <h3>Rotas ativas</h3>
-        <div id="routesList" class="list muted">Nenhuma rota.</div>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost" type="button" onclick="location.hash='#/home'">Início</button>
       </div>
-    </section>
+    </header>
 
-    <section id="tab_fleet" class="tabpage hidden">
-      <div class="card">
-        <h3>Comprar aeronave</h3>
-        <div class="grid">
-          <label>Modelo</label>
-          <select id="buyModel"></select>
-          <label>Nome (opcional)</label>
-          <input id="buyName" placeholder="Ex: PR-VALE" />
-        </div>
-        <button id="buyBtn" class="btn primary">Comprar</button>
-      </div>
-      <div class="card">
-        <h3>Sua frota</h3>
-        <div id="fleetList" class="list muted">Sem aeronaves.</div>
-      </div>
-    </section>
+    <main class="main">
+      <div id="view" class="view"></div>
+    </main>
 
-<section id="tab_hubs" class="tabpage hidden">
-  <div class="card">
-    <h3>HUBs e Slots</h3>
-    <p class="muted">HUB aumenta slots/dia e bônus de demanda. Slots limitam quantos voos sua companhia consegue operar em cada aeroporto por dia.</p>
-    <div class="grid">
-      <label>Aeroporto</label>
-      <select id="hubAirport"></select>
-    </div>
-    <button id="createHubBtn" class="btn primary">Criar HUB</button>
+    <footer class="footer">
+      <span>© Vale Games</span>
+      <span class="dot">•</span>
+      <span>Offline • LocalStorage</span>
+    </footer>
+
+    <!-- Badge fixo (build + data dos dados) -->
+    <div id="buildBadge" class="build-badge" aria-label="Build"></div>
   </div>
-  <div class="card">
-    <h3>Seus HUBs</h3>
-    <div id="hubsList" class="list muted">Nenhum HUB.</div>
-  </div>
-</section>
 
-<section id="tab_career" class="tabpage hidden">
-  <div class="card">
-    <h3>Carreira</h3>
-    <div id="careerBox" class="muted">Carregando…</div>
-  </div>
-</section>
+  <!-- App principal -->
+  <script src="./app.js?v=1.14.9" defer></script>
 
-    <section id="tab_rnd" class="tabpage hidden">
-  <div class="card">
-    <h3>P&amp;D (R&amp;D)</h3>
-    <p class="muted">Pesquise melhorias permanentes para reduzir custos e aumentar a ocupação.</p>
-    <div class="grid">
-      <label>Tecnologia</label>
-      <select id="techSelect"></select>
-    </div>
-    <button id="buyTechBtn" class="btn primary">Pesquisar</button>
-    <div id="rndBox" class="muted" style="margin-top:10px;">—</div>
-  </div>
-</section>
+  <!-- Guardas de UX (não altera lógica do jogo) -->
+  <script>
+    (function(){
+      // remove splash em até 2s sempre
+      setTimeout(function(){
+        var splash = document.getElementById('splash');
+        if (splash) { splash.classList.add('hidden'); splash.style.display='none'; }
+      }, 2000);
 
-<section id="tab_marketing" class="tabpage hidden">
-  <div class="card">
-    <h3>Marketing</h3>
-    <p class="muted">Defina um orçamento diário e ative campanhas.</p>
-    <div class="grid">
-      <label>Orçamento/dia</label>
-      <input id="marketingBudget" type="number" min="0" step="1000000" value="0" />
-      <button id="setMarketingBtn" class="btn primary">Aplicar</button>
-    </div>
-    <div class="grid">
-      <label>Campanha</label>
-      <select id="campaignSelect"></select>
-    </div>
-    <button id="activateCampaignBtn" class="btn">Ativar campanha</button>
-    <div id="marketingBox" class="muted" style="margin-top:10px;">—</div>
-  </div>
-</section>
-
-<section id="tab_alliances" class="tabpage hidden">
-  <div class="card">
-    <h3>Alianças</h3>
-    <p class="muted">Acordos para aumentar demanda e reduzir taxas.</p>
-    <div class="grid">
-      <label>Acordo</label>
-      <select id="allianceSelect"></select>
-    </div>
-    <button id="buyAllianceBtn" class="btn primary">Adquirir</button>
-    <div id="alliancesBox" class="muted" style="margin-top:10px;">—</div>
-  </div>
-</section>
-
-<section id="tab_saves" class="tabpage hidden">
-      <div class="card">
-        <h3>Backup do save</h3>
-        <div class="row">
-          <button id="exportBtn" class="btn">Exportar save</button>
-          <label class="btn ghost" for="importFile">Importar save</label>
-          <input id="importFile" type="file" accept="application/json" />
-        </div>
-        <p class="muted">Exportar/Importar é o jeito mais seguro de mover o progresso entre PC e celular.</p>
-      </div>
-    </section>
-  </aside>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <script src="js/store.js"></script>
-  <script src="js/data.js"></script>
-  <script src="js/economy.js"></script>
-  <script src="js/market.js"></script>
-  <script src="js/events.js"></script>
-  <script src="js/ai_companies.js"></script>
-  <script src="js/map.js"></script>
-  <script src="js/hubs.js"></script>
-  <script src="js/progression.js"></script>
-  <script src="js/rnd.js"></script>
-  <script src="js/marketing.js"></script>
-  <script src="js/alliances.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/game.js"></script>
-  <script src="js/bootstrap.js"></script>
-<script src="js/sound.js"></script>
-<script src="js/reports.js"></script>
+      // Se depois de 5s ainda não renderizou nada, mostra uma tela de fallback
+      setTimeout(function(){
+        var viewEl = document.getElementById('view');
+        if (viewEl && !viewEl.innerHTML.trim()){
+          viewEl.innerHTML =
+            '<div class="card">' +
+              '<div class="card-header">' +
+                '<div><div class="card-title">Carregando...</div><div class="card-subtitle">O jogo está demorando para iniciar (GitHub Pages)</div></div>' +
+                '<span class="badge">VFM</span>' +
+              '</div>' +
+              '<div class="card-body">' +
+                '<div class="notice">Se ficar preso aqui, recarregue a página (Ctrl+F5).</div>' +
+                '<div class="sep"></div>' +
+                '<button class="btn btn-primary" type="button" onclick="location.reload()">Recarregar</button>' +
+              '</div>' +
+            '</div>';
+        }
+      }, 5000);
+    })();
+  </script>
 </body>
 </html>
