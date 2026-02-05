@@ -1,3 +1,4 @@
+const CACHE_NAME = "vale-fly-sim-build_2026-02-05_hotfix1";
 const CACHE = "flysim-cache-v1";
 const CORE_ASSETS = [
   "./",
