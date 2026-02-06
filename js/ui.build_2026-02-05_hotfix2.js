@@ -238,19 +238,16 @@ if(buyAllianceBtn){
     }
 
     const ld = s.lastDay || {revenue:0,costs:0,profit:0,canceled:0,notes:[]};
-    const notes = (ld.notes && ld.notes.length) ? (ld.notes.map(n=>`• ${n}`).join("\n")) : "";
-    document.getElementById("lastDayLog").textContent =
-      `Último dia:
-` +
-      `Receita: ${money(ld.revenue)}
-` +
-      `Custos:  ${money(ld.costs)}
-` +
-      `Lucro:  ${money(ld.profit)}
-` +
-      (ld.canceled ? `Cancelamentos: ${ld.canceled}
-` : "") +
-      notes; 
+    const notes = (ld.notes && ld.notes.length) ? (ld.notes.map(n=>`\u2022 ${n}`).join("\n")) : "";
+    const lastDayText =
+      "Ultimo dia:\n" +
+      `Receita: ${money(ld.revenue)}\n` +
+      `Custos:  ${money(ld.costs)}\n` +
+      `Lucro:   ${money(ld.profit)}\n` +
+      (ld.canceled ? `Cancelamentos: ${ld.canceled}\n` : "") +
+      notes;
+    const lastDayEl = document.getElementById("lastDayLog");
+    if(lastDayEl) lastDayEl.textContent = lastDayText; 
 
     // selects
     const airports = (window.ProgressionModule?.getAvailableAirports?.(s) || s.airports).slice().sort((a,b)=>a.code.localeCompare(b.code));
