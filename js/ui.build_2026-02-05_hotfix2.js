@@ -238,9 +238,7 @@ if(buyAllianceBtn){
     }
 
     const ld = s.lastDay || {revenue:0,costs:0,profit:0,canceled:0,notes:[]};
-    const notes = (ld.notes && ld.notes.length) ? (`
-${ld.notes.map(n=>`• ${n}`).join("
-")}`) : "";
+    const notes = (ld.notes && ld.notes.length) ? (ld.notes.map(n=>`• ${n}`).join("\n")) : "";
     document.getElementById("lastDayLog").textContent =
       `Último dia:
 ` +

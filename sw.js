@@ -1,5 +1,5 @@
 // Vale Fly Simulator 1.0 — Service Worker (Offline Cache)
-// BUILD_2026-02-06
+// BUILD_2026-02-06_HF1
 // Fix crítico: lista de CORE_ASSETS quebrada estava impedindo o cache do UI e módulos,
 // causando falhas offline (e, em alguns aparelhos, o "menu" não abrir por falta de UI carregado).
 
