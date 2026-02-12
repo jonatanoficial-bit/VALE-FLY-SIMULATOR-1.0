@@ -2,199 +2,213 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>VALE-FLY-SIMULATOR 1.0</title>
-  <link rel="manifest" href="manifest.webmanifest" />
-  <meta name="theme-color" content="#020617" />
-  <link rel="icon" href="assets/images/logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Last Call Dispatch Operator</title>
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="css/app.css" />
+  <!-- Forçar não-cache (ajuda, mas o principal é o ?v nos scripts) -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <link rel="stylesheet" href="./styles.css?v=2025-12-26-01" />
 </head>
+
 <body>
-  <header id="topbar">
-    <div class="brand">
-      <img src="assets/images/logo.png" alt="Logo" />
-      <div>
-        <div class="title">VALE-FLY-SIMULATOR <span id="buildTag" style="opacity:.75;font-size:12px;margin-left:8px;"></span></div>
-        <div class="subtitle">FlySim 2026 • Build Comercial (Fix GitHub Pages)</div>
-      </div>
-    </div>
-    <div class="top-actions">
-      <button id="btnInstall" class="btn ghost" title="Instalar (PWA)">Instalar</button>
-      <button id="menuBtn" class="btn">☰</button>
-    </div>
-  </header>
-
-  <main id="map"></main>
-
-  <aside id="panel" aria-hidden="true">
-    <div class="tabs">
-      <button class="tab active" data-tab="overview">Visão geral</button>
-      <button class="tab" data-tab="routes">Rotas</button>
-      <button class="tab" data-tab="fleet">Frota</button>
-      <button class="tab" data-tab="saves">Save</button>
-      <button class="tab" data-tab="hubs">HUBs</button>
-      <button class="tab" data-tab="career">Carreira</button>
-      <button class="tab" data-tab="rnd">P&amp;D</button>
-      <button class="tab" data-tab="marketing">Marketing</button>
-      <button class="tab" data-tab="alliances">Alianças</button>
-    </div>
-
-    <section id="tab_overview" class="tabpage">
-      <div class="cards">
-        <div class="card"><div class="label">Dia</div><div class="value" id="clockText">—</div></div>
-        <div class="card"><div class="label">Caixa</div><div class="value" id="cashText">—</div></div>
-        <div class="card"><div class="label">Reputação</div><div class="value" id="repText">—</div></div>
-        <div class="card"><div class="label">Nível</div><div class="value" id="lvlText">—</div></div>
-        <div class="card"><div class="label">XP</div><div class="value" id="xpText">—</div></div>
-      </div>
-      <div class="row">
-        <button id="advanceDayBtn" class="btn primary">Avançar dia</button>
-        <button id="resetBtn" class="btn danger">Reset</button>
-      </div>
-      <div class="log" id="lastDayLog"></div>
-    </section>
-
-    <section id="tab_routes" class="tabpage hidden">
-      <div class="card">
-        <h3>Criar rota</h3>
-        <div class="grid">
-          <label>Origem</label>
-          <select id="routeFrom"></select>
-          <label>Destino</label>
-          <select id="routeTo"></select>
-          <label>Preço (R$)</label>
-          <input id="routePrice" type="number" min="50" step="10" value="500" />
-          <label>Voos/dia</label>
-          <input id="routeFreq" type="number" min="1" max="12" value="1" />
-          <label>Aeronave</label>
-          <select id="routeAircraft"></select>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo"></div>
+        <div class="brandText">
+          <div class="title">Last Call Dispatch Operator</div>
+          <div class="subtitle">Simulador de Central de Emergência</div>
         </div>
-        <button id="addRouteBtn" class="btn primary">Adicionar rota</button>
       </div>
-      <div class="card">
-        <h3>Rotas ativas</h3>
-        <div id="routesList" class="list muted">Nenhuma rota.</div>
-      </div>
-    </section>
 
-    <section id="tab_fleet" class="tabpage hidden">
-      <div class="card">
-        <h3>Comprar aeronave</h3>
-        <div class="grid">
-          <label>Modelo</label>
-          <select id="buyModel"></select>
-          <label>Nome (opcional)</label>
-          <input id="buyName" placeholder="Ex: PR-VALE" />
+      <div class="hud">
+        <div class="hudItem">
+          <div class="hudLabel">Turno</div>
+          <div class="hudValue" id="hudShift">—</div>
         </div>
-        <button id="buyBtn" class="btn primary">Comprar</button>
-      </div>
-      <div class="card">
-        <h3>Sua frota</h3>
-        <div id="fleetList" class="list muted">Sem aeronaves.</div>
-      </div>
-    </section>
-
-<section id="tab_hubs" class="tabpage hidden">
-  <div class="card">
-    <h3>HUBs e Slots</h3>
-    <p class="muted">HUB aumenta slots/dia e bônus de demanda. Slots limitam quantos voos sua companhia consegue operar em cada aeroporto por dia.</p>
-    <div class="grid">
-      <label>Aeroporto</label>
-      <select id="hubAirport"></select>
-    </div>
-    <button id="createHubBtn" class="btn primary">Criar HUB</button>
-  </div>
-  <div class="card">
-    <h3>Seus HUBs</h3>
-    <div id="hubsList" class="list muted">Nenhum HUB.</div>
-  </div>
-</section>
-
-<section id="tab_career" class="tabpage hidden">
-  <div class="card">
-    <h3>Carreira</h3>
-    <div id="careerBox" class="muted">Carregando…</div>
-  </div>
-</section>
-
-    <section id="tab_rnd" class="tabpage hidden">
-  <div class="card">
-    <h3>P&amp;D (R&amp;D)</h3>
-    <p class="muted">Pesquise melhorias permanentes para reduzir custos e aumentar a ocupação.</p>
-    <div class="grid">
-      <label>Tecnologia</label>
-      <select id="techSelect"></select>
-    </div>
-    <button id="buyTechBtn" class="btn primary">Pesquisar</button>
-    <div id="rndBox" class="muted" style="margin-top:10px;">—</div>
-  </div>
-</section>
-
-<section id="tab_marketing" class="tabpage hidden">
-  <div class="card">
-    <h3>Marketing</h3>
-    <p class="muted">Defina um orçamento diário e ative campanhas.</p>
-    <div class="grid">
-      <label>Orçamento/dia</label>
-      <input id="marketingBudget" type="number" min="0" step="1000000" value="0" />
-      <button id="setMarketingBtn" class="btn primary">Aplicar</button>
-    </div>
-    <div class="grid">
-      <label>Campanha</label>
-      <select id="campaignSelect"></select>
-    </div>
-    <button id="activateCampaignBtn" class="btn">Ativar campanha</button>
-    <div id="marketingBox" class="muted" style="margin-top:10px;">—</div>
-  </div>
-</section>
-
-<section id="tab_alliances" class="tabpage hidden">
-  <div class="card">
-    <h3>Alianças</h3>
-    <p class="muted">Acordos para aumentar demanda e reduzir taxas.</p>
-    <div class="grid">
-      <label>Acordo</label>
-      <select id="allianceSelect"></select>
-    </div>
-    <button id="buyAllianceBtn" class="btn primary">Adquirir</button>
-    <div id="alliancesBox" class="muted" style="margin-top:10px;">—</div>
-  </div>
-</section>
-
-<section id="tab_saves" class="tabpage hidden">
-      <div class="card">
-        <h3>Backup do save</h3>
-        <div class="row">
-          <button id="exportBtn" class="btn">Exportar save</button>
-          <label class="btn ghost" for="importFile">Importar save</label>
-          <input id="importFile" type="file" accept="application/json" />
+        <div class="hudItem">
+          <div class="hudLabel">Tempo</div>
+          <div class="hudValue" id="hudTime">00:00</div>
         </div>
-        <p class="muted">Exportar/Importar é o jeito mais seguro de mover o progresso entre PC e celular.</p>
+        <div class="hudItem">
+          <div class="hudLabel">Pontos</div>
+          <div class="hudValue" id="hudScore">0</div>
+        </div>
+        <div class="hudItem">
+          <div class="hudLabel">Chamadas</div>
+          <div class="hudValue" id="hudQueue">0</div>
+        </div>
+
+        <div class="hudItem">
+          <div class="hudLabel">Stress</div>
+          <div class="hudValue hudMeter" id="hudStress" style="--meter:0%">0%</div>
+        </div>
       </div>
-    </section>
-  </aside>
+    </header>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <main>
+      <!-- SCREEN 1: Setup (cidade/agência/dificuldade) -->
+      <div class="screen grid active" id="screenSetup">
+        <section class="card">
+          <div class="cardTitle">Configuração</div>
 
-  <script src="js/store.js"></script>
-  <script src="js/data.js"></script>
-  <script src="js/economy.js"></script>
-  <script src="js/market.js"></script>
-  <script src="js/events.js"></script>
-  <script src="js/ai_companies.js"></script>
-  <script src="js/map.js"></script>
-  <script src="js/hubs.js"></script>
-  <script src="js/progression.js"></script>
-  <script src="js/rnd.js"></script>
-  <script src="js/marketing.js"></script>
-  <script src="js/alliances.js"></script>
-  <script src="js/ui.build_2026-02-05_hotfix2.js"></script>
-  <script src="js/game.js"></script>
-  <script src="js/bootstrap.js"></script>
-<script src="js/sound.js"></script>
-<script src="js/reports.js"></script>
-  <script src="./js/build_info.js"></script>
+        <div class="formRow">
+          <label class="label">Cidade</label>
+          <select id="citySelect" class="select"></select>
+        </div>
+
+        <div class="formRow">
+          <label class="label">Agência</label>
+          <select id="agencySelect" class="select">
+            <option value="police">Polícia</option>
+            <option value="fire">Bombeiros</option>
+          </select>
+        </div>
+
+        <div class="formRow">
+          <label class="label">Dificuldade</label>
+          <select id="difficultySelect" class="select">
+            <option value="easy">Fácil</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Difícil</option>
+          </select>
+        </div>
+
+          <div class="btnRow">
+            <button id="btnToLobby" class="btnPrimary">Continuar</button>
+          </div>
+
+        <div class="hint">
+          Regra do jogo: você <b>atende</b> e depois faz <b>despacho manual</b>. Se for trote, o correto é <b>encerrar</b>.
+        </div>
+        </section>
+      </div>
+
+      <!-- SCREEN 2: Lobby (confirmação + unidades) -->
+      <div class="screen grid" id="screenLobby">
+        <section class="card">
+          <div class="cardTitle">Lobby</div>
+          <div class="hint" id="lobbySummary">—</div>
+
+          <div class="subCard" style="margin-top:12px;">
+            <div class="subTitle">🎖️ Carreira</div>
+            <div class="pills" id="lobbyCareerPills"></div>
+            <div class="hint" id="lobbyUnlocksHint" style="margin-top:8px;">—</div>
+            <div class="btnRow" style="margin-top:10px;">
+              <button id="btnResetCareer" class="btnGhost">Resetar carreira</button>
+            </div>
+          </div>
+
+          <div class="subCard" style="margin-top:12px;">
+            <div class="subTitle">💼 Semana (Campanha)</div>
+            <div class="pills" id="lobbyCampaignPills"></div>
+            <div class="hint" id="lobbyCampaignHint" style="margin-top:8px;">—</div>
+            <div class="btnRow" style="margin-top:10px;">
+              <button id="btnResetWeek" class="btnGhost">Resetar semana</button>
+            </div>
+          </div>
+
+          <div class="subCard" style="margin-top:12px;">
+            <div class="subTitle">💰 Operação</div>
+            <div class="pills" id="lobbyEconomyPills"></div>
+            <div class="hint" id="lobbyEconomyHint" style="margin-top:8px;">—</div>
+          </div>
+
+          <div class="subCard" style="margin-top:12px;">
+            <div class="subTitle">🧩 Upgrades</div>
+            <div id="lobbyUpgrades" class="upgradeGrid">—</div>
+            <div class="hint" id="lobbyUpgradesHint" style="margin-top:8px;">Compre melhorias com o orçamento para reduzir stress, ganhar tempo e aumentar eficiência.</div>
+          </div>
+
+          <div class="subCard" style="margin-top:12px;">
+            <div class="subTitle">🎯 Objetivos do turno</div>
+            <div id="lobbyObjectives" class="summary">—</div>
+          </div>
+          <div class="btnRow" style="margin-top:12px;">
+            <button id="btnBackSetup" class="btnGhost">Voltar</button>
+            <button id="btnToShift" class="btnPrimary">Ir para o plantão</button>
+          </div>
+          <div class="hint" style="margin-top:10px;">Revise as unidades disponíveis antes de iniciar o turno.</div>
+        </section>
+
+        <section class="card">
+          <div class="cardTitle">Unidades</div>
+          <div id="unitsList" class="list"></div>
+          <div class="hint">Dica: cada unidade tem função (role). Enviar errado dá penalidade.</div>
+        </section>
+      </div>
+
+      <!-- SCREEN 3: Plantão (jogo) -->
+      <div class="screen grid" id="screenShift">
+        <section class="card">
+          <div class="cardTitle">Controles do Turno</div>
+          <div class="hint" id="shiftSummaryTop">—</div>
+          <div class="btnRow" style="margin-top:12px;">
+            <button id="btnBackLobby" class="btnGhost">Lobby</button>
+            <button id="btnStartShift" class="btnPrimary">Iniciar Turno</button>
+            <button id="btnEndShift" class="btnGhost" disabled>Encerrar Turno</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="cardTitle">Operação</div>
+
+        <div class="pills">
+          <div class="pill" id="pillStatus">Turno parado</div>
+          <div class="pill pillWarn" id="pillCallTimer">Sem chamada</div>
+        </div>
+
+        <div class="subCard">
+          <div class="subTitle">📞 Chamada Atual</div>
+          <div class="meta" id="callMeta">—</div>
+          <div class="callBox" id="callText">Inicie um turno para receber chamadas.</div>
+
+          <div class="btnRow">
+            <button id="btnAnswer" class="btnPrimary" disabled>Atender próxima</button>
+            <button id="btnHold" class="btnGhost" disabled>Colocar em espera</button>
+          </div>
+        </div>
+
+        <div class="subCard">
+          <div class="subTitle">🚓 Despacho Manual</div>
+          <div class="meta" id="dispatchInfo">—</div>
+
+          <label class="label" style="margin-top:8px;">Escolha a unidade</label>
+          <select id="dispatchUnitSelect" class="select" disabled></select>
+
+          <div class="btnRow">
+            <button id="btnDispatch" class="btnPrimary" disabled>Despachar</button>
+            <button id="btnDismiss" class="btnGhost" disabled>Encerrar chamada</button>
+          </div>
+
+          <div class="hint">Você pontua por escolher a unidade certa (ou encerrar trote) dentro do tempo.</div>
+        </div>
+        </section>
+
+        <section class="card">
+          <div class="cardTitle">Fila de Chamadas</div>
+          <div id="queueList" class="queue">—</div>
+        </section>
+
+        <section class="card">
+          <div class="cardTitle">Registro</div>
+          <pre id="log" class="log"></pre>
+        </section>
+
+        <section class="card">
+          <div class="cardTitle">Resumo do Turno</div>
+          <div id="shiftSummary" class="summary">Nenhum turno ativo.</div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- MUITO IMPORTANTE: ordem e cache-busting -->
+  <script src="./data/cities.js?v=2025-12-26-01"></script>
+  <script src="./data/calls.js?v=2025-12-26-01"></script>
+  <script src="./script.js?v=2025-12-26-01"></script>
 </body>
 </html>
