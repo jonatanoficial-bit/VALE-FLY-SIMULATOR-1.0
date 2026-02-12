@@ -54,6 +54,16 @@ window.DEFAULT_GAME_STATE = {
     {"code": "SYD", "city": "Sydney", "country": "Austrália", "name": "Sydney", "lat": -33.9399, "lon": 151.1753, "runwayM": 3962, "tier": "hub"}
   ],
   aircraftCatalog: [
+    {"modelId": "A320", "name": "Airbus A320", "seats": 180, "rangeKm": 6100, "price": 98000000, "fuelBurnPerKm": 2.6},
+    {"modelId": "A320NEO", "name": "Airbus A320neo", "seats": 186, "rangeKm": 6500, "price": 112000000, "fuelBurnPerKm": 2.3},
+    {"modelId": "A321", "name": "Airbus A321", "seats": 220, "rangeKm": 7400, "price": 129000000, "fuelBurnPerKm": 2.9},
+    {"modelId": "B738", "name": "Boeing 737-800", "seats": 174, "rangeKm": 5600, "price": 97000000, "fuelBurnPerKm": 2.7},
+    {"modelId": "B737MAX", "name": "Boeing 737 MAX", "seats": 178, "rangeKm": 6700, "price": 121000000, "fuelBurnPerKm": 2.4},
+    {"modelId": "E195E2", "name": "Embraer E195-E2", "seats": 132, "rangeKm": 4800, "price": 61000000, "fuelBurnPerKm": 1.9},
+    {"modelId": "ATR72", "name": "ATR 72-600", "seats": 70, "rangeKm": 1500, "price": 28000000, "fuelBurnPerKm": 0.9},
+    {"modelId": "A330", "name": "Airbus A330-300", "seats": 260, "rangeKm": 11750, "price": 238000000, "fuelBurnPerKm": 5.2},
+    {"modelId": "B787", "name": "Boeing 787-8", "seats": 242, "rangeKm": 13620, "price": 248000000, "fuelBurnPerKm": 4.9},
+
     {"modelId": "TP-72", "name": "TurboProp 72", "seats": 72, "rangeKm": 1500, "price": 45000000, "fuelBurnPerKm": 1.2},
     {"modelId": "RJ-100", "name": "Regional Jet 100", "seats": 100, "rangeKm": 3200, "price": 85000000, "fuelBurnPerKm": 1.8},
     {"modelId": "NB-180", "name": "NarrowBody 180", "seats": 180, "rangeKm": 6000, "price": 220000000, "fuelBurnPerKm": 2.6},

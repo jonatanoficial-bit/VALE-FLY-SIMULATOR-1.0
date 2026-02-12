@@ -276,7 +276,8 @@ if(buyAllianceBtn){
 
     // buy select
     const buyModel = document.getElementById("buyModel");
-    const availModels = (window.ProgressionModule?.getAvailableModels?.(s) || s.aircraftCatalog);
+    const availModelsRaw = (window.ProgressionModule?.getAvailableModels?.(s));
+    const availModels = (availModelsRaw && availModelsRaw.length) ? availModelsRaw : s.aircraftCatalog;
     buyModel.innerHTML = availModels.map(m => `<option value="${m.modelId}">${m.name} — ${money(m.price)}</option>`).join("");
 
     // lists
@@ -298,7 +299,7 @@ if(buyAllianceBtn){
       const ac = s.fleet.find(a=>a.id===r.aircraftId);
       const model = ac ? s.aircraftCatalog.find(m=>m.modelId===ac.modelId) : null;
       return `
-        <div class="item">
+        <div class="item">${aircraftImgTag(a.modelId)}
           <div>
             <div><b>${r.from} → ${r.to}</b> ${r.active?"":"<span class='muted'>(pausada)</span>"}</div>
             <div class="meta">${r.freq} voos/dia • R$ ${r.price} • Avião: ${ac?.nickname || "—"} (${model?.seats || "?"} assentos)</div>

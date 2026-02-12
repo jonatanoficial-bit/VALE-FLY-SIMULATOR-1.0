@@ -1,13 +1,11 @@
 // Vale Fly Simulator 1.0 — Service Worker (Offline Cache)
-// BUILD_2026-02-06_HF1
-// Fix crítico: lista de CORE_ASSETS quebrada estava impedindo o cache do UI e módulos,
-// causando falhas offline (e, em alguns aparelhos, o "menu" não abrir por falta de UI carregado).
+// BUILD_2026-02-12_STAGE3_02
+// Generated: 2026-02-12 15:48:33
 
-const CACHE = "flysim-cache-v4"; // bump para invalidar caches antigos (v1)
+const CACHE = "flysim-cache-v5";
 const CORE_ASSETS = [
   "./",
   "./index.html",
-
   "./css/app.css",
 
   "./js/store.js",
@@ -27,16 +25,20 @@ const CORE_ASSETS = [
   "./js/bootstrap.js",
   "./js/sound.js",
   "./js/reports.js",
+  "./js/build_info.js",
+  "./js/ux.js",
 
   "./assets/images/logo.png",
   "./assets/images/map_bg.png",
   "./assets/images/cover.png",
+  "./assets/avatars/player.svg",
+  "./assets/aircraft/models/README.txt",
+  "./assets/aircraft/models/placeholder.png",
+
   "./favicon.ico",
   "./manifest.webmanifest",
-  "./manifest.json"  "./assets/aircraft/models/README.txt",  "./assets/aircraft/models/placeholder.png",  "./js/build_info.js",
-
-
-
+  "./manifest.json",
+  "./BUILD.txt"
 ];
 
 self.addEventListener("install", (event) => {
@@ -57,7 +59,6 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
-
   if (req.method !== "GET") return;
 
   event.respondWith(
@@ -66,7 +67,6 @@ self.addEventListener("fetch", (event) => {
 
       return fetch(req)
         .then((resp) => {
-          // Cache somente mesma origem
           try {
             const url = new URL(req.url);
             if (url.origin === self.location.origin) {
@@ -77,7 +77,6 @@ self.addEventListener("fetch", (event) => {
           return resp;
         })
         .catch(() => {
-          // fallback: se pedir uma página, devolve index
           if (req.headers.get("accept")?.includes("text/html")) {
             return caches.match("./index.html");
           }
