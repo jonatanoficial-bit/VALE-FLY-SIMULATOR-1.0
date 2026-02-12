@@ -90,3 +90,41 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-famil
   border:1px solid #ffffff18;
   box-shadow:0 10px 24px #00000033;
 }
+
+/* ===== Stage 4.2 — Loja Premium + Modal Picker ===== */
+.row{display:flex;gap:10px;align-items:center}
+.btnSmall{padding:8px 10px;border-radius:12px;font-weight:900}
+.modal.hidden{display:none}
+.modal{position:fixed;inset:0;z-index:80}
+.modalBackdrop{position:absolute;inset:0;background:#00000088;backdrop-filter:blur(2px)}
+.modalSheet{
+  position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+  width:min(980px,100%);max-height:86vh;
+  background:#0b1222;border:1px solid #ffffff18;border-bottom:none;
+  border-top-left-radius:20px;border-top-right-radius:20px;
+  box-shadow:0 -18px 50px #00000055;
+  overflow:hidden;
+}
+.modalHeader{display:flex;justify-content:space-between;align-items:center;padding:14px 14px;border-bottom:1px solid #ffffff14}
+.modalTitle{font-weight:1000;letter-spacing:.2px}
+.modalBody{padding:14px;display:flex;flex-direction:column;gap:12px}
+.gridCards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(min-width:720px){.gridCards{grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media(min-width:980px){.gridCards{grid-template-columns:repeat(4,minmax(0,1fr));}}
+
+.cardMini{
+  border:1px solid #ffffff18;
+  background:#ffffff08;
+  border-radius:18px;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  cursor:pointer;
+  transition:transform .08s ease, filter .18s ease;
+}
+.cardMini:active{transform:scale(.99)}
+.cardMini .imgWrap{height:74px;display:flex;align-items:center;justify-content:center;background:#00000022;border:1px solid #ffffff10;border-radius:14px}
+.cardMini .imgWrap img{max-width:100%;max-height:100%;object-fit:contain}
+.cardMini .title{font-weight:1000}
+.cardMini .metaLine{color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:10px}

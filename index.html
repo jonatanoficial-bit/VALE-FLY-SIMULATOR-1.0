@@ -84,7 +84,10 @@
         <h3>Comprar aeronave</h3>
         <div class="grid">
           <label>Modelo</label>
-          <select id="buyModel"></select>
+          <div class="row">
+             <select id="buyModel"></select>
+             <button id="openAircraftPicker" class="btn btnSmall" type="button">Escolher</button>
+           </div>
           <label>Nome (opcional)</label>
           <input id="buyName" placeholder="Ex: PR-VALE" />
         </div>
@@ -196,5 +199,21 @@
 <script src="js/sound.js"></script>
 <script src="js/reports.js"></script>
   <script src="./js/build_info.js"></script>
+
+  <!-- Aircraft Picker Modal (Stage 4.2) -->
+  <div id="aircraftPicker" class="modal hidden" aria-hidden="true">
+    <div class="modalBackdrop" data-close="1"></div>
+    <div class="modalSheet" role="dialog" aria-modal="true" aria-label="Escolher aeronave">
+      <div class="modalHeader">
+        <div class="modalTitle">Escolher aeronave</div>
+        <button class="btn btnSmall" id="closeAircraftPicker" type="button">Fechar</button>
+      </div>
+      <div class="modalBody">
+        <input id="aircraftSearch" class="input" placeholder="Buscar modelo (ex: A320, 737, Embraer)..." />
+        <div id="aircraftGrid" class="gridCards"></div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
