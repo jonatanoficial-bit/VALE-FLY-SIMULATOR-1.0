@@ -6,12 +6,11 @@ window.UIModule = (() => {
   }
 
 
+
 function aircraftImgTag(modelId){
   const src = `assets/aircraft/models/${modelId}.png`;
   const ph = `assets/aircraft/models/placeholder.png`;
   return `<img class="aircraftImg" src="${src}" onerror="this.onerror=null;this.src=\'${ph}\';"/>`;
-}
-.png" onerror="this.style.display='none'"/>`;
 }
 
   function init(){
@@ -302,7 +301,7 @@ if(buyAllianceBtn){
       const ac = s.fleet.find(a=>a.id===r.aircraftId);
       const model = ac ? s.aircraftCatalog.find(m=>m.modelId===ac.modelId) : null;
       return `
-        <div class="item">${aircraftImgTag(a.modelId)}
+        <div class="item fleetItem">${aircraftImgTag(a.modelId)}
           <div>
             <div><b>${r.from} → ${r.to}</b> ${r.active?"":"<span class='muted'>(pausada)</span>"}</div>
             <div class="meta">${r.freq} voos/dia • R$ ${r.price} • Avião: ${ac?.nickname || "—"} (${model?.seats || "?"} assentos)</div>

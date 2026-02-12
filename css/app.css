@@ -58,3 +58,35 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-famil
   border:1px solid #ffffff1f;
   margin-top:6px;
 }
+
+/* ===== Stage 4 — Visual AAA (mobile-first) ===== */
+.fleetItem{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+.fleetItem .aircraftImg{
+  flex:0 0 auto;
+}
+.fleetItem .meta{
+  flex:1 1 auto;
+  min-width:0;
+}
+.fleetItem .meta .name{
+  font-weight:900;
+  letter-spacing:.2px;
+}
+.fleetItem .meta .sub{
+  color:var(--muted);
+  font-size:12px;
+}
+.btn{
+  transition:transform .08s ease, filter .18s ease;
+}
+.btn:active{
+  transform:scale(.98);
+}
+.card{
+  border:1px solid #ffffff18;
+  box-shadow:0 10px 24px #00000033;
+}

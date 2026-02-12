@@ -2,7 +2,7 @@
 // BUILD_2026-02-12_STAGE3_02
 // Generated: 2026-02-12 15:48:33
 
-const CACHE = "flysim-cache-v6";
+const CACHE = "flysim-cache-v7";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -38,7 +38,16 @@ const CORE_ASSETS = [
   "./favicon.ico",
   "./manifest.webmanifest",
   "./manifest.json",
-  "./BUILD.txt"  "./assets/aircraft/models/placeholder.svg",
+  "./BUILD.txt"  "./assets/aircraft/models/placeholder.svg",  "./assets/aircraft/models/A320.png",  "./assets/aircraft/models/A320NEO.png",  "./assets/aircraft/models/A321.png",  "./assets/aircraft/models/B738.png",  "./assets/aircraft/models/B737MAX.png",  "./assets/aircraft/models/E195E2.png",  "./assets/aircraft/models/ATR72.png",  "./assets/aircraft/models/A330.png",  "./assets/aircraft/models/B787.png",
+
+
+
+
+
+
+
+
+
 
 ];
 
