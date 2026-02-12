@@ -5,6 +5,12 @@ window.UIModule = (() => {
     return new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(n);
   }
 
+
+function aircraftImgTag(modelId){
+  // Use PNG or WEBP if available. onerror hides it, keeping UI clean.
+  return `<img class="aircraftImg" src="assets/aircraft/models/${modelId}.png" onerror="this.style.display='none'"/>`;
+}
+
   function init(){
     const panel = document.getElementById("panel");
     const menuBtn = document.getElementById("menuBtn");
@@ -516,4 +522,17 @@ function renderAlliances(){
 
 return { init, render };
 
+})();
+
+// Aircraft preview (shop)
+(function(){
+  const sel = document.getElementById("buyModel");
+  const img = document.getElementById("buyModelPreview");
+  if(!sel || !img) return;
+  function upd(){
+    const id = sel.value || "";
+    img.src = `assets/aircraft/models/${id}.png`;
+  }
+  sel.addEventListener("change", upd);
+  setTimeout(upd, 50);
 })();

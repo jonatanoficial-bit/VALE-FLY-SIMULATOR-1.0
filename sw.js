@@ -3,7 +3,7 @@
 // Fix crítico: lista de CORE_ASSETS quebrada estava impedindo o cache do UI e módulos,
 // causando falhas offline (e, em alguns aparelhos, o "menu" não abrir por falta de UI carregado).
 
-const CACHE = "flysim-cache-v2"; // bump para invalidar caches antigos (v1)
+const CACHE = "flysim-cache-v4"; // bump para invalidar caches antigos (v1)
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -33,7 +33,10 @@ const CORE_ASSETS = [
   "./assets/images/cover.png",
   "./favicon.ico",
   "./manifest.webmanifest",
-  "./manifest.json"
+  "./manifest.json"  "./assets/aircraft/models/README.txt",  "./assets/aircraft/models/placeholder.png",  "./js/build_info.js",
+
+
+
 ];
 
 self.addEventListener("install", (event) => {
