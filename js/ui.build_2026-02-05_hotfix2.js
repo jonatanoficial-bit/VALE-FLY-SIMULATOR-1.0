@@ -7,8 +7,11 @@ window.UIModule = (() => {
 
 
 function aircraftImgTag(modelId){
-  // Use PNG or WEBP if available. onerror hides it, keeping UI clean.
-  return `<img class="aircraftImg" src="assets/aircraft/models/${modelId}.png" onerror="this.style.display='none'"/>`;
+  const src = `assets/aircraft/models/${modelId}.png`;
+  const ph = `assets/aircraft/models/placeholder.png`;
+  return `<img class="aircraftImg" src="${src}" onerror="this.onerror=null;this.src=\'${ph}\';"/>`;
+}
+.png" onerror="this.style.display='none'"/>`;
 }
 
   function init(){
@@ -532,8 +535,7 @@ return { init, render };
   if(!sel || !img) return;
   function upd(){
     const id = sel.value || "";
-    img.src = `assets/aircraft/models/${id}.png`;
-  }
+    img.src = `assets/aircraft/models/${id}.png`;}
   sel.addEventListener("change", upd);
   setTimeout(upd, 50);
 })();

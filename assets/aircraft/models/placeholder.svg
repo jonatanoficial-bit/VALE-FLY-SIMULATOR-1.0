@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="288" viewBox="0 0 512 288">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1f2937"/>
+      <stop offset="1" stop-color="#0b1222"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="512" height="288" rx="28" fill="url(#g)"/>
+  <path d="M64 172c54-18 105-28 152-30l60-46c14-11 33-14 50-8l40 15 66-4c12-1 22 8 23 20 1 12-8 22-20 23l-80 6-38 21c-12 7-26 8-39 3l-34-12-38 31c-8 7-18 11-29 12-58 6-111 19-160 39-11 4-23-1-28-12-4-11 1-23 12-28z"
+        fill="#94a3b8" opacity="0.75"/>
+  <text x="50%" y="78%" text-anchor="middle" font-family="system-ui,Segoe UI,Roboto,Arial" font-size="28" fill="#94a3b8" opacity="0.9">
+    Adicione imagens em assets/aircraft/models/
+  </text>
+</svg>

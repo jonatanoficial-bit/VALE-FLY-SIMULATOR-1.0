@@ -2,7 +2,7 @@
 // BUILD_2026-02-12_STAGE3_02
 // Generated: 2026-02-12 15:48:33
 
-const CACHE = "flysim-cache-v5";
+const CACHE = "flysim-cache-v6";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -38,7 +38,8 @@ const CORE_ASSETS = [
   "./favicon.ico",
   "./manifest.webmanifest",
   "./manifest.json",
-  "./BUILD.txt"
+  "./BUILD.txt"  "./assets/aircraft/models/placeholder.svg",
+
 ];
 
 self.addEventListener("install", (event) => {

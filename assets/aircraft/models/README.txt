@@ -1,11 +1,7 @@
-Imagens realistas de aeronaves (avatars)
+Imagens realistas de aeronaves (miniaturas)
 
-Coloque aqui PNGs/WEBPs com fundo transparente ou recortado.
-Nome do arquivo = ID do modelo (exact):
-A319.png, A320.png, A320NEO.png, A321.png, A321NEO.png,
-B737.png, B738.png, B737MAX.png,
-E175.png, E190.png, E195.png, E195E2.png,
-ATR72.png,
-A330.png, B787.png
+O jogo busca automaticamente: assets/aircraft/models/<MODEL_ID>.png
+Se não existir, ele usa o placeholder: assets/aircraft/models/placeholder.png
 
-Dica: largura 512px, sem fundo.
+Exemplos de nomes:
+A320.png, A320NEO.png, A321.png, B738.png, B737MAX.png, E195E2.png, ATR72.png, A330.png, B787.png
