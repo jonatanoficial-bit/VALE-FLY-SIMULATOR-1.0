@@ -14,9 +14,6 @@ function aircraftImgTag(modelId){
 }
 
   function init(){
-    // Stage 4.2
-    setTimeout(()=>{ try{ initAircraftPicker(); }catch(e){ console.warn('aircraft picker init fail', e);} }, 0);
-
     const panel = document.getElementById("panel");
     const menuBtn = document.getElementById("menuBtn");
     const btnInstall = document.getElementById("btnInstall");
@@ -525,71 +522,6 @@ function renderAlliances(){
   const owned = Object.keys(s.alliances?.owned||{}).length;
   box.innerHTML = `Intl +${Math.round((s.alliances?.intlLoadBonus01||0)*100)}% • Taxas ${(s.alliances?.airportFeeMult||1).toFixed(2)}x • Long ${(s.alliances?.longRevenueMult||1).toFixed(2)}x • Acordos: <b>${owned}</b>`;
 }
-
-
-  function initAircraftPicker(){
-    const modal = document.getElementById("aircraftPicker");
-    const openBtn = document.getElementById("openAircraftPicker");
-    const closeBtn = document.getElementById("closeAircraftPicker");
-    const grid = document.getElementById("aircraftGrid");
-    const search = document.getElementById("aircraftSearch");
-    const sel = document.getElementById("buyModel");
-    const preview = document.getElementById("buyModelPreview");
-
-    if(!modal || !openBtn || !closeBtn || !grid || !search || !sel) return;
-
-    function open(){
-      modal.classList.remove("hidden");
-      modal.setAttribute("aria-hidden","false");
-      renderGrid(search.value || "");
-      setTimeout(()=>search.focus(), 30);
-    }
-    function close(){
-      modal.classList.add("hidden");
-      modal.setAttribute("aria-hidden","true");
-    }
-    function renderGrid(q){
-      const s = window.gameState || window.DEFAULT_GAME_STATE;
-      const list = s.aircraftCatalog || [];
-      const query = (q||"").toLowerCase().trim();
-      const filtered = !query ? list : list.filter(m=>{
-        const t = `${m.modelId} ${m.name}`.toLowerCase();
-        return t.includes(query);
-      });
-
-      grid.innerHTML = filtered.map(m=>{
-        const img = `<img src="assets/aircraft/models/${m.modelId}.png" onerror="this.onerror=null;this.src='assets/aircraft/models/placeholder.png';" alt="${m.name}">`;
-        const km = Math.round(m.rangeKm||0);
-        const seats = m.seats||0;
-        return `
-          <div class="cardMini" data-model="${m.modelId}">
-            <div class="imgWrap">${img}</div>
-            <div class="title">${m.modelId} • ${m.name}</div>
-            <div class="metaLine"><span>${seats} assentos</span><span>${km} km</span></div>
-            <div class="metaLine"><span>Preço</span><span>${money(m.price||0)}</span></div>
-          </div>
-        `;
-      }).join("") || `<div style="color:var(--muted);padding:10px">Nenhum modelo encontrado.</div>`;
-    }
-
-    openBtn.addEventListener("click", open);
-    closeBtn.addEventListener("click", close);
-    modal.querySelector(".modalBackdrop")?.addEventListener("click", close);
-
-    search.addEventListener("input", ()=>renderGrid(search.value||""));
-
-    grid.addEventListener("click", (e)=>{
-      const card = e.target.closest(".cardMini");
-      if(!card) return;
-      const id = card.getAttribute("data-model");
-      sel.value = id;
-      sel.dispatchEvent(new Event("change"));
-      if(preview){
-        preview.src = `assets/aircraft/models/${id}.png`;
-      }
-      close();
-    });
-  }
 
 return { init, render };
 
