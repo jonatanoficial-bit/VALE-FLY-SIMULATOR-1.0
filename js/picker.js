@@ -1,6 +1,6 @@
-// BUILD_2026-02-12_STAGE4_02_HF1
-// Generated: 2026-02-12 21:50:14
-// Aircraft Picker (runs after DOM + gameState)
+// BUILD_2026-02-13_STAGE4_03
+// Generated: 2026-02-13 13:12:13
+// Visual Aircraft Shop (inline grid + modal). Non-breaking: keeps <select> as source of truth.
 
 (function(){
   function money(n){
@@ -8,101 +8,138 @@
     catch(_){ return "R$ " + (n||0); }
   }
 
-  function ready(){
-    return document.getElementById("aircraftPicker")
-      && document.getElementById("openAircraftPicker")
-      && document.getElementById("closeAircraftPicker")
-      && document.getElementById("aircraftGrid")
-      && document.getElementById("aircraftSearch")
-      && document.getElementById("buyModel")
-      && (window.gameState || window.DEFAULT_GAME_STATE);
+  function state(){
+    return window.gameState || window.DEFAULT_GAME_STATE || {};
+  }
+
+  function list(){
+    return (state().aircraftCatalog || []).slice();
+  }
+
+  function ensure(){
+    return document.getElementById("buyModel")
+      && document.getElementById("shopGrid")
+      && document.getElementById("buyModelPreview");
+  }
+
+  function cardHTML(m){
+    const img = `<img src="assets/aircraft/models/${m.modelId}.png" onerror="this.onerror=null;this.src='assets/aircraft/models/placeholder.png';" alt="${m.name}">`;
+    const km = Math.round(m.rangeKm||0);
+    const seats = m.seats||0;
+    return `
+      <div class="cardMini" data-model="${m.modelId}">
+        <div class="imgWrap">${img}</div>
+        <div class="title">${m.modelId} • ${m.name}</div>
+        <div class="metaLine"><span>${seats} assentos</span><span>${km} km</span></div>
+        <div class="metaLine"><span>Preço</span><span>${money(m.price||0)}</span></div>
+      </div>
+    `;
+  }
+
+  function renderInline(){
+    const grid = document.getElementById("shopGrid");
+    const sel = document.getElementById("buyModel");
+    if(!grid || !sel) return;
+    const models = list();
+    // Show top 6 inline for fast purchase (mobile-friendly)
+    const top = models.slice(0, 6);
+    grid.innerHTML = top.map(cardHTML).join("");
+    syncSelected(grid, sel.value);
+  }
+
+  function syncSelected(container, modelId){
+    container.querySelectorAll(".cardMini").forEach(c=>c.classList.toggle("selected", c.getAttribute("data-model")===modelId));
+  }
+
+  function openModal(){
+    const modal = document.getElementById("aircraftPicker");
+    if(!modal) return;
+    modal.classList.remove("hidden");
+    modal.setAttribute("aria-hidden","false");
+    renderModalGrid("");
+    setTimeout(()=>document.getElementById("aircraftSearch")?.focus(), 30);
+  }
+
+  function closeModal(){
+    const modal = document.getElementById("aircraftPicker");
+    if(!modal) return;
+    modal.classList.add("hidden");
+    modal.setAttribute("aria-hidden","true");
+  }
+
+  function renderModalGrid(q){
+    const grid = document.getElementById("aircraftGrid");
+    const sel = document.getElementById("buyModel");
+    if(!grid || !sel) return;
+    const query = (q||"").toLowerCase().trim();
+    const models = list();
+    const filtered = !query ? models : models.filter(m=>`${m.modelId} ${m.name}`.toLowerCase().includes(query));
+    grid.innerHTML = filtered.map(cardHTML).join("") || `<div style="color:rgba(255,255,255,.6);padding:10px">Nenhum modelo encontrado.</div>`;
+    syncSelected(grid, sel.value);
+  }
+
+  function setModel(id){
+    const sel = document.getElementById("buyModel");
+    const preview = document.getElementById("buyModelPreview");
+    if(!sel) return;
+    sel.value = id;
+    sel.dispatchEvent(new Event("change"));
+    if(preview) preview.src = `assets/aircraft/models/${id}.png`;
+    // sync both grids
+    const inline = document.getElementById("shopGrid");
+    const modalGrid = document.getElementById("aircraftGrid");
+    if(inline) syncSelected(inline, id);
+    if(modalGrid) syncSelected(modalGrid, id);
   }
 
   function init(){
-    const modal = document.getElementById("aircraftPicker");
+    const sel = document.getElementById("buyModel");
     const openBtn = document.getElementById("openAircraftPicker");
     const closeBtn = document.getElementById("closeAircraftPicker");
-    const grid = document.getElementById("aircraftGrid");
+    const backdrop = document.querySelector("#aircraftPicker .modalBackdrop");
     const search = document.getElementById("aircraftSearch");
-    const sel = document.getElementById("buyModel");
-    const preview = document.getElementById("buyModelPreview");
-    const backdrop = modal?.querySelector(".modalBackdrop");
+    const inline = document.getElementById("shopGrid");
+    const modalGrid = document.getElementById("aircraftGrid");
 
-    if(!modal || !openBtn || !closeBtn || !grid || !search || !sel) return;
+    renderInline();
 
-    function open(){
-      modal.classList.remove("hidden");
-      modal.setAttribute("aria-hidden","false");
-      renderGrid(search.value||"");
-      setTimeout(()=>search.focus(), 30);
-    }
-    function close(){
-      modal.classList.add("hidden");
-      modal.setAttribute("aria-hidden","true");
-    }
-
-    function getList(){
-      const s = window.gameState || window.DEFAULT_GAME_STATE || {};
-      return (s.aircraftCatalog || []).slice();
-    }
-
-    function renderGrid(q){
-      const list = getList();
-      const query = (q||"").toLowerCase().trim();
-      const filtered = !query ? list : list.filter(m=>{
-        const t = `${m.modelId} ${m.name}`.toLowerCase();
-        return t.includes(query);
-      });
-
-      grid.innerHTML = filtered.map(m=>{
-        const img = `<img src="assets/aircraft/models/${m.modelId}.png" onerror="this.onerror=null;this.src='assets/aircraft/models/placeholder.png';" alt="${m.name}">`;
-        const km = Math.round(m.rangeKm||0);
-        const seats = m.seats||0;
-        return `
-          <div class="cardMini" data-model="${m.modelId}">
-            <div class="imgWrap">${img}</div>
-            <div class="title">${m.modelId} • ${m.name}</div>
-            <div class="metaLine"><span>${seats} assentos</span><span>${km} km</span></div>
-            <div class="metaLine"><span>Preço</span><span>${money(m.price||0)}</span></div>
-          </div>
-        `;
-      }).join("") || `<div style="color:var(--muted);padding:10px">Nenhum modelo encontrado.</div>`;
-    }
-
-    openBtn.addEventListener("click", open);
-    closeBtn.addEventListener("click", close);
-    backdrop?.addEventListener("click", close);
-    search.addEventListener("input", ()=>renderGrid(search.value||""));
-
-    grid.addEventListener("click", (e)=>{
+    inline?.addEventListener("click", (e)=>{
       const card = e.target.closest(".cardMini");
       if(!card) return;
-      const id = card.getAttribute("data-model");
-      sel.value = id;
-      sel.dispatchEvent(new Event("change"));
-      if(preview) preview.src = `assets/aircraft/models/${id}.png`;
-      close();
+      setModel(card.getAttribute("data-model"));
     });
 
-    // keep preview synced
-    sel.addEventListener("change", ()=>{
-      if(preview) preview.src = `assets/aircraft/models/${sel.value}.png`;
+    openBtn?.addEventListener("click", openModal);
+    closeBtn?.addEventListener("click", closeModal);
+    backdrop?.addEventListener("click", closeModal);
+    search?.addEventListener("input", ()=>renderModalGrid(search.value||""));
+
+    modalGrid?.addEventListener("click", (e)=>{
+      const card = e.target.closest(".cardMini");
+      if(!card) return;
+      setModel(card.getAttribute("data-model"));
+      closeModal();
+    });
+
+    sel?.addEventListener("change", ()=>{
+      const id = sel.value;
+      const preview = document.getElementById("buyModelPreview");
+      if(preview) preview.src = `assets/aircraft/models/${id}.png`;
+      syncSelected(inline, id);
+      if(modalGrid) syncSelected(modalGrid, id);
     });
   }
 
   function boot(){
-    if(ready()) return init();
-    let tries = 0;
-    const t = setInterval(()=>{
+    if(ensure()) return init();
+    let tries=0;
+    const t=setInterval(()=>{
       tries++;
-      if(ready()){ clearInterval(t); init(); }
+      if(ensure()){ clearInterval(t); init(); }
       if(tries>80) clearInterval(t);
     }, 100);
   }
 
-  if(document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
-  } else {
-    boot();
-  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
 })();

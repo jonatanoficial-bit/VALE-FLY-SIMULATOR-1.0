@@ -2,7 +2,7 @@
 // BUILD_2026-02-12_STAGE3_02
 // Generated: 2026-02-12 15:48:33
 
-const CACHE = "flysim-cache-v9";
+const CACHE = "flysim-cache-v10";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -26,10 +26,10 @@ const CORE_ASSETS = [
   "./js/sound.js",
   "./js/reports.js",
   "./js/build_info.js",
-  "./js/ux.js",
-
     "./js/picker.js",
-"./assets/images/logo.png",
+"./js/ux.js",
+
+  "./assets/images/logo.png",
   "./assets/images/map_bg.png",
   "./assets/images/cover.png",
   "./assets/avatars/player.svg",
