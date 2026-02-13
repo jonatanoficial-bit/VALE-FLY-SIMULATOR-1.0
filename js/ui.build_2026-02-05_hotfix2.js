@@ -511,6 +511,78 @@ function renderMarketing(){
   box.innerHTML = `Ativas: <b>${active}</b> • Bônus ocupação: +${Math.round((window.MarketingModule.getLoadBonus01(s)||0)*100)}%`;
 }
 
+
+  function fmtInt(n){ try{return new Intl.NumberFormat('pt-BR').format(Math.round(n||0));}catch(_){return String(Math.round(n||0));} }
+  function pct(n){ return (Math.round((n||0)*10)/10).toFixed(1) + "%"; }
+
+  function renderKPIs(s){
+    const bar = document.getElementById("kpiBar");
+    if(!bar) return;
+
+    const cash = s.money ?? 0;
+    const day = s.day ?? 1;
+
+    // Simple derived KPIs (non-breaking). Uses existing economy fields when available.
+    const revenue = (s.lastDay?.revenue ?? s.daily?.revenue ?? s.lastRevenue ?? 0);
+    const costs = (s.lastDay?.costs ?? s.daily?.costs ?? s.lastCosts ?? 0);
+    const profit = (typeof revenue === "number" && typeof costs === "number") ? (revenue - costs) : 0;
+
+    const fleetCount = (s.fleet?.length ?? 0);
+    const routesCount = (s.routes?.length ?? 0);
+
+    bar.innerHTML = `
+      <div class="kpi"><div class="label">Caixa</div><div class="value">${money(cash)}</div><div class="delta">Dia ${fmtInt(day)}</div></div>
+      <div class="kpi"><div class="label">Lucro diário</div><div class="value">${money(profit)}</div><div class="delta">Receita ${money(revenue)} • Custos ${money(costs)}</div></div>
+      <div class="kpi"><div class="label">Frota</div><div class="value">${fmtInt(fleetCount)}</div><div class="delta">${fleetCount===1?'aeronave':'aeronaves'}</div></div>
+      <div class="kpi"><div class="label">Rotas</div><div class="value">${fmtInt(routesCount)}</div><div class="delta">${routesCount===1?'rota ativa':'rotas ativas'}</div></div>
+    `;
+
+    const news = document.getElementById("newsBar");
+    if(news){
+      // Light “headline” placeholder pulling from market/events if present
+      const evt = (s.lastEvent?.title || s.lastEvent?.name || s.market?.headline || "");
+      news.textContent = evt ? `📣 ${evt}` : "📣 Dica: compre aeronaves, crie rotas e acompanhe o lucro diário.";
+    }
+  }
+
+  function renderRouteCards(s){
+    const wrap = document.getElementById("routeCards");
+    if(!wrap) return;
+    const routes = Array.isArray(s.routes) ? s.routes : [];
+
+    if(!routes.length){
+      wrap.innerHTML = `<div class="newsBar">Nenhuma rota criada ainda. Vá em <b>Rotas</b> para criar sua primeira rota.</div>`;
+      return;
+    }
+
+    // Create premium card list from existing route data structure
+    wrap.innerHTML = routes.map((r, idx)=>{
+      const from = r.from?.icao || r.fromIcao || r.origin || r.from || "???";
+      const to = r.to?.icao || r.toIcao || r.dest || r.to || "???";
+      const dist = r.distanceKm ?? r.distance ?? 0;
+      const model = r.aircraftModel || r.modelId || r.model || (r.aircraft?.modelId) || "";
+      const pax = r.pax ?? r.passengers ?? "";
+      const est = r.estimatedProfit ?? r.profit ?? "";
+      const distStr = dist ? (fmtInt(dist) + " km") : "—";
+      const paxStr = pax!=="" ? (fmtInt(pax) + " pax") : "";
+      const estStr = (typeof est === "number") ? money(est) : (est ? String(est) : "");
+      return `
+        <div class="routeCard" data-route="${idx}">
+          <div class="left">
+            <div class="title">${from} → ${to}</div>
+            <div class="sub">
+              <span class="badge">📏 ${distStr}</span>
+              ${model?`<span class="badge">✈️ ${model}</span>`:""}
+              ${paxStr?`<span class="badge">👥 ${paxStr}</span>`:""}
+              ${estStr?`<span class="badge">💰 ${estStr}</span>`:""}
+            </div>
+          </div>
+          <div class="badge">Ativa</div>
+        </div>
+      `;
+    }).join("");
+  }
+
 function renderAlliances(){
   const s = window.gameState;
   const box = document.getElementById("alliancesBox");

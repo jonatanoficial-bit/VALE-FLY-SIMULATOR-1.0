@@ -136,3 +136,65 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-famil
 .cardMini .title{font-weight:1000}
 .cardMini .metaLine{color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:10px}
 .cardMini.selected{outline:2px solid #2563eb; outline-offset:2px}
+
+/* ===== Stage 4.4 — Dashboard KPIs + Rotas Premium ===== */
+.sectionTitle{font-weight:1000;letter-spacing:.2px;margin:6px 0 10px}
+.kpiBar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}
+@media(min-width:720px){.kpiBar{grid-template-columns:repeat(4,minmax(0,1fr));}}
+.kpi{
+  border:1px solid #ffffff18;
+  background:linear-gradient(180deg,#ffffff0a,#ffffff06);
+  border-radius:18px;
+  padding:12px;
+  box-shadow:0 12px 26px #0000002e;
+}
+.kpi .label{color:var(--muted);font-size:12px;margin-bottom:4px}
+.kpi .value{font-weight:1000;font-size:18px}
+.kpi .delta{margin-top:6px;font-size:12px;color:var(--muted)}
+.newsBar{
+  border:1px solid #ffffff14;background:#ffffff08;border-radius:16px;padding:10px 12px;
+  color:var(--muted);font-size:12px;margin-bottom:10px
+}
+.routeCards{display:flex;flex-direction:column;gap:10px}
+.routeCard{
+  border:1px solid #ffffff18;background:#ffffff08;border-radius:18px;padding:12px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  box-shadow:0 12px 26px #0000002e;
+}
+.routeCard .left{display:flex;flex-direction:column;gap:6px;min-width:0}
+.routeCard .title{font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.routeCard .sub{color:var(--muted);font-size:12px;display:flex;gap:10px;flex-wrap:wrap}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 10px;border-radius:999px;
+  background:#00000022;border:1px solid #ffffff14;
+  color:var(--muted);font-size:12px;font-weight:800;
+}
+
+/* ===== Stage 5.1 — Plane animation (3D-ish) ===== */
+.planeIcon{background:transparent;border:none}
+.plane3d{
+  width:28px;height:28px;
+  transform-origin:50% 50%;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));
+}
+.plane3d .planeBody{
+  width:28px;height:28px;border-radius:14px;
+  background:linear-gradient(180deg,#ffffffcc,#ffffff66);
+  border:1px solid rgba(255,255,255,.35);
+  position:relative;
+  transform:perspective(120px) rotateX(22deg);
+}
+.plane3d .planeBody:before{
+  content:"";
+  position:absolute;left:6px;top:12px;
+  width:16px;height:4px;border-radius:4px;
+  background:rgba(37,99,235,.95);
+  box-shadow:0 0 0 1px rgba(255,255,255,.25) inset;
+}
+.plane3d .planeBody:after{
+  content:"";
+  position:absolute;left:12px;top:6px;
+  width:4px;height:16px;border-radius:4px;
+  background:rgba(148,163,184,.7);
+}

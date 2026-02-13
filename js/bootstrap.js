@@ -7,6 +7,34 @@
   // Make sure nested keys exist (forward-compat)
   window.flightData.company ||= { cash: 0, reputation01: 0.5, day: 1 };
   window.flightData.airports ||= [];
+
+  // Stage 5 — load extra airports dataset (offline bundled)
+  (async ()=>{
+    try{
+      const resp = await fetch("./assets/data/airports_extra.json", { cache: "no-store" });
+      if(!resp.ok) return;
+      const j = await resp.json();
+      const extra = Array.isArray(j.airports) ? j.airports : [];
+      if(!extra.length) return;
+
+      const s = window.flightData;
+      s.airports ||= [];
+      const existing = new Set(s.airports.map(a=>a.code));
+      for(const a of extra){
+        if(!a || !a.code) continue;
+        if(!existing.has(a.code)){
+          s.airports.push(a);
+          existing.add(a.code);
+        }
+      }
+      // persist merge once
+      FlySimStore.save(s);
+      window.dispatchEvent(new Event("game-updated"));
+    }catch(e){
+      console.warn("extra airports load failed", e);
+    }
+  })();
+
   window.flightData.aircraftCatalog ||= [];
   window.flightData.fleet ||= [];
   window.flightData.routes ||= [];
