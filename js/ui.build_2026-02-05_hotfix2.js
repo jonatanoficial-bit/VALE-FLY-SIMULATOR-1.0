@@ -14,6 +14,24 @@ function aircraftImgTag(modelId){
 }
 
   function init(){
+    const routeCards = document.getElementById('routeCards');
+    routeCards?.addEventListener('click', (e)=>{
+      const btn = e.target.closest('button[data-action]');
+      if(!btn) return;
+      const act = btn.getAttribute('data-action');
+      const idx = Number(btn.getAttribute('data-idx'));
+      const s = window.gameState;
+      if(!s || !Array.isArray(s.routes) || !s.routes[idx]) return;
+      const r = s.routes[idx];
+      const base = (window.DemandModule?.baselineFare?.(r.distanceKm||r.distance||0) ?? 0);
+      if(!r.price) r.price = base;
+      const step = Math.max(10, Math.round((r.price||0)*0.05));
+      if(act==='priceUp') r.price = (r.price||0) + step;
+      if(act==='priceDown') r.price = Math.max(10, (r.price||0) - step);
+      try{ FlySimStore.save(s);}catch(_){ }
+      try{ window.dispatchEvent(new Event('game-updated')); }catch(_){ }
+    });
+
     const panel = document.getElementById("panel");
     const menuBtn = document.getElementById("menuBtn");
     const btnInstall = document.getElementById("btnInstall");
@@ -29,7 +47,51 @@ function aircraftImgTag(modelId){
     });
 
     // Day advance
-    document.getElementById("advanceDayBtn").onclick = () => {
+    function doAdvanceDay(){
+      if(window.gameState?.settings?.autoFlights){
+        await startFlights();
+        return;
+      }
+      const sum = EconomyModule.advanceDay(window.gameState);
+      FlySimStore.save(window.gameState);
+      render();
+      MapModule.render();
+      return sum;
+    }
+
+    async function startFlights(){
+      const s = window.gameState;
+      s.flags ||= {};
+      s.flags.flightsInProgress = true;
+      FlySimStore.save(s);
+      MapModule.render();
+      render();
+      // simulate flight time (visual). Keep short for mobile.
+      await new Promise(res=>setTimeout(res, 9000));
+      const sum = doAdvanceDay();
+      s.flags.flightsInProgress = false;
+      FlySimStore.save(s);
+      render();
+      MapModule.render();
+      return sum;
+    }
+
+    // Voos
+    document.getElementById("startFlightsBtn").onclick = async () => {
+      try{ await startFlights(); }catch(e){ console.error(e); alert("Falha ao iniciar voos."); }
+    };
+
+    const autoToggle = document.getElementById("autoFlightsToggle");
+    if(autoToggle){
+      autoToggle.checked = !!window.gameState?.settings?.autoFlights;
+      autoToggle.onchange = () => {
+        window.gameState.settings ||= {};
+        window.gameState.settings.autoFlights = autoToggle.checked;
+        FlySimStore.save(window.gameState);
+      };
+    }
+
+    document.getElementById("advanceDayBtn").onclick = async () => {
       const res = EconomyModule.advanceDay(window.gameState);
       FlySimStore.save(window.gameState);
       render();
@@ -566,6 +628,9 @@ function renderMarketing(){
       const distStr = dist ? (fmtInt(dist) + " km") : "—";
       const paxStr = pax!=="" ? (fmtInt(pax) + " pax") : "";
       const estStr = (typeof est === "number") ? money(est) : (est ? String(est) : "");
+      const base = (window.DemandModule?.baselineFare?.(dist) ?? 0);
+      const price = r.price ?? base;
+      const demandPct = Math.round((load01||0)*100);
       return `
         <div class="routeCard" data-route="${idx}">
           <div class="left">
@@ -575,6 +640,13 @@ function renderMarketing(){
               ${model?`<span class="badge">✈️ ${model}</span>`:""}
               ${paxStr?`<span class="badge">👥 ${paxStr}</span>`:""}
               ${estStr?`<span class="badge">💰 ${estStr}</span>`:""}
+              <span class="badge">📊 Demanda ${demandPct}%</span>
+            </div>
+            <div class="sub" style="margin-top:6px">
+              <span class="badge">🎫 Preço ${money(price)}</span>
+              <button class="btn btnSmall" data-action="priceDown" data-idx="${idx}" type="button">−</button>
+              <button class="btn btnSmall" data-action="priceUp" data-idx="${idx}" type="button">+</button>
+              <span class="badge">Base ${money(base)}</span>
             </div>
           </div>
           <div class="badge">Ativa</div>

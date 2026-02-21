@@ -23,20 +23,10 @@
   }
 
     function demandLoadFactor(state, distKm, price, from, to){
-    // Ocupação = reputação + demanda (aeroportos) + preço + concorrência + eventos
-    const rep = state.company.reputation01 ?? 0.5;
-    const repFactor = 0.55 + rep*0.55; // 0.55..1.10
-
-    const demandMult = (window.MarketModule?.routeDemandMultiplier?.(state, from, to)) ?? 0.75;
-    const baseline = (window.MarketModule?.baselineFare?.(distKm)) ?? Math.max(120, Math.round(distKm*0.9));
-    const priceEff = (window.MarketModule?.priceEffect?.(price, baseline)) ?? 1.0;
-    const compEff  = (window.MarketModule?.competitionFactor?.(state, from, to)) ?? 1.0;
-
-    // Penalidade leve em rotas muito longas
-    const distPenalty = Math.min(0.22, distKm/16000);
-
-    const lf = (0.58 * repFactor) * demandMult * priceEff * compEff;
-    return clamp01(lf - distPenalty);
+    try{
+      return window.DemandModule?.loadFactor?.(state, distKm, price, from, to) ?? 0.65;
+    }catch(_){}
+    return 0.65;
   }
 
 
@@ -104,6 +94,7 @@ const slotsFor = (code) => (window.HubsModule?.getSlotsForAirport?.(state, code)
 
 
       for(const r of state.routes){
+        r._dayRevenue = 0; r._dayCost = 0; r._dayPax = 0; r._dayFlights = 0; r._dayCanceled = 0; r._dayLoad01 = 0;
         if(!r.active) continue;
 
         const ac = getAircraft(state, r.aircraftId);
@@ -127,7 +118,7 @@ const slotsFor = (code) => (window.HubsModule?.getSlotsForAirport?.(state, code)
         const risk = Math.max(0, (0.35 - (ac.condition01 ?? 0.7)));
         const cancelProb = clamp01(risk * 2.2);
 
-        const load = demandLoadFactor(state, dist);
+        const load = demandLoadFactor(state, dist, r.price, r.from, r.to);
         // bônus de HUB aumenta demanda nas rotas que partem/chegam em hubs do jogador
 const hubBonus = (window.HubsModule?.getDemandBonus01?.(state, r.from) || 0) + (window.HubsModule?.getDemandBonus01?.(state, r.to) || 0);
 const paxPerFlight = Math.round(model.seats * Math.min(1, load + hubBonus));
@@ -142,6 +133,7 @@ for(let i=0;i<effFreq;i++){
   const usedTo = (airportUse[r.to]||0);
   if(usedFrom + 1 > slotsFor(r.from) || usedTo + 1 > slotsFor(r.to)){
     canceled += 1;
+     r._dayCanceled += 1;
     notes.push(`Slots insuficientes em ${r.from} ou ${r.to}. Voo cancelado.`);
     state.company.reputation01 = clamp01((state.company.reputation01||0.5) - 0.005);
     continue;
@@ -151,18 +143,26 @@ for(let i=0;i<effFreq;i++){
 
           if(Math.random() < cancelProb){
             canceled += 1;
+     r._dayCanceled += 1;
             state.company.reputation01 = clamp01((state.company.reputation01||0.5) - 0.01);
             continue;
           }
 
-          revenue += paxPerFlight * r.price;
+          const rev = paxPerFlight * r.price;
+           revenue += rev;
+           r._dayRevenue += rev;
+           r._dayPax += paxPerFlight;
+           r._dayFlights += 1;
+           r._dayLoad01 += (paxPerFlight / Math.max(1, model.seats));
           successFlights += 1;
 
           // custos (combustível + taxas)
           const fuelPrice = (state.market?.fuelPricePerUnit ?? 4200);
           const fuel = dist * model.fuelBurnPerKm * fuelPrice;
           const fees = 1200000 + dist*120;
-          opCost += fuel + fees;
+          const c = fuel + fees;
+           opCost += c;
+           r._dayCost += c;
 
           // desgaste proporcional à distância
           ac.condition01 = clamp01((ac.condition01 ?? 0.9) - (0.010 + dist/250000));
@@ -170,6 +170,21 @@ for(let i=0;i<effFreq;i++){
           // reputação sobe levemente por operação estável
           state.company.reputation01 = clamp01((state.company.reputation01||0.5) + 0.0005);
         }
+      }
+
+      for(const r of state.routes){
+        if(!r || !r.active) continue;
+        const flights = r._dayFlights||0;
+        const load01 = flights ? (r._dayLoad01/flights) : 0;
+        r.lastDay = {
+          flights,
+          canceled: r._dayCanceled||0,
+          pax: r._dayPax||0,
+          revenue: Math.round(r._dayRevenue||0),
+          cost: Math.round(r._dayCost||0),
+          profit: Math.round((r._dayRevenue||0)-(r._dayCost||0)),
+          load01
+        };
       }
 
       const costs = salary + maintCost + opCost;

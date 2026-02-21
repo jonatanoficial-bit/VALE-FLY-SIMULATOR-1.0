@@ -113,7 +113,7 @@ function render(){
       line.bindTooltip(`${r.from} → ${r.to} • ${r.freq}x/dia`, { sticky:true });
       line.addTo(routeLayer);
 
-      if(r.active){
+      if(r.active && (d.flags?.flightsInProgress || r.flying)){
         const marker = createPlaneMarker([A.lat,A.lon]);
         marker.addTo(planeLayer);
         // duration scales with distance but stays within limits

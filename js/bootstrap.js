@@ -17,7 +17,7 @@
       const extra = Array.isArray(j.airports) ? j.airports : [];
       if(!extra.length) return;
 
-      const s = window.flightData;
+      const s = window.gameState || window.flightData;
       s.airports ||= [];
       const existing = new Set(s.airports.map(a=>a.code));
       for(const a of extra){

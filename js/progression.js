@@ -76,9 +76,11 @@
 
   function isAirportUnlocked(state, airport){
     ensure(state);
-    // sempre pode operar "mid". hub/mega precisam desbloqueio
-    const t = airport.tier || "mid";
-    return t==="mid" || isTierUnlocked(state, t);
+    if(state.progress.unlockAllAirports) return true;
+    const code = airport.code;
+    // Always keep company's hub airports unlocked
+    if(state.hubs?.some(h=>h.code===code)) return true;
+    return state.progress.unlockedAirports?.includes(code) || false;
   }
 
   function getAvailableAirports(state){

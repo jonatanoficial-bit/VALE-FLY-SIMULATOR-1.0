@@ -2,7 +2,7 @@
 // BUILD_2026-02-12_STAGE3_02
 // Generated: 2026-02-12 15:48:33
 
-const CACHE = "flysim-cache-v12";
+const CACHE = "flysim-cache-v13";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -12,6 +12,7 @@ const CORE_ASSETS = [
   "./js/data.js",
   "./js/economy.js",
   "./js/market.js",
+  "./js/demand.js",
   "./js/events.js",
   "./js/ai_companies.js",
   "./js/map.js",
