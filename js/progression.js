@@ -74,12 +74,27 @@
     return state.progress.unlockedTiers.includes(tier);
   }
 
-  function isAirportUnlocked(state, airport){
+  
+  function hubsHasAirport(state, code){
+    const hubs = state?.hubs;
+    if(!hubs) return false;
+    if(Array.isArray(hubs)){
+      return hubs.some(h => h && (h.airport===code || h.code===code || h.icao===code));
+    }
+    // object map
+    try{
+      return Object.values(hubs).some(h => h && (h.airport===code || h.code===code || h.icao===code));
+    }catch(_){
+      return false;
+    }
+  }
+
+function isAirportUnlocked(state, airport){
     ensure(state);
     if(state.progress.unlockAllAirports) return true;
     const code = airport.code;
     // Always keep company's hub airports unlocked
-    if(state.hubs?.some(h=>h.code===code)) return true;
+    if(hubsHasAirport(state, code)) return true;
     return state.progress.unlockedAirports?.includes(code) || false;
   }
 
