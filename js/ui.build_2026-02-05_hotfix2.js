@@ -47,7 +47,7 @@ function aircraftImgTag(modelId){
     });
 
     // Day advance
-    function doAdvanceDay(){
+    async function doAdvanceDay(){
       if(window.gameState?.settings?.autoFlights){
         await startFlights();
         return;
