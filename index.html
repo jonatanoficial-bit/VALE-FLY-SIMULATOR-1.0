@@ -16,6 +16,7 @@
   <div id="introOverlay" class="introOverlay" aria-hidden="false">
     <video id="introVideo" class="introVideo" preload="auto" playsinline muted>
       <source src="./assets/video/intro.mp4" type="video/mp4">
+      <source src="./intro.mp4" type="video/mp4">
     </video>
     <div class="introControls">
       <button id="introSkip" class="btn introSkip" type="button">Pular</button>
@@ -266,6 +267,15 @@
           finish();
           return;
         }
+
+        // HEAD check: if file missing, skip intro
+        fetch('./assets/video/intro.mp4', { method:'HEAD', cache:'no-store' }).then(r=>{
+          if(!r.ok){
+            return fetch('./intro.mp4', { method:'HEAD', cache:'no-store' }).then(r2=>{ if(!r2.ok) throw new Error('missing'); else video.load(); });
+          } else {
+            video.load();
+          }
+        }).catch(()=>{ finish(); });
 
         // Autoplay policy: muted + playsinline, try to play; if blocked, show tap-to-play hint
         const tryPlay = ()=> video.play().catch(()=> {

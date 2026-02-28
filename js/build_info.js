@@ -1,12 +1,12 @@
-// BUILD_2026-02-28_INTRO_VIDEO_01
-// Generated: 2026-02-28 14:43:43
+// BUILD_2026-02-28_INTRO_VIDEO_02
+// Generated: 2026-02-28 15:20:14
 
 window.__BUILD__ = {
-  id: "BUILD_2026-02-28_INTRO_VIDEO_01",
-  generatedAt: "2026-02-28 14:43:43"
+  id: "BUILD_2026-02-28_INTRO_VIDEO_02",
+  generatedAt: "2026-02-28 15:20:14"
 };
 
 (function(){
   const tag = document.getElementById("buildTag");
-  if(tag) tag.textContent = `(BUILD_2026-02-28_INTRO_VIDEO_01 | 2026-02-28 14:43:43)`;
+  if(tag) tag.textContent = `(BUILD_2026-02-28_INTRO_VIDEO_02 | 2026-02-28 15:20:14)`;
 })();

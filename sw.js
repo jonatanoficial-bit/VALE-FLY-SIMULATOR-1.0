@@ -2,9 +2,10 @@
 // BUILD_2026-02-12_STAGE3_02
 // Generated: 2026-02-12 15:48:33
 
-const CACHE = "flysim-cache-v16";
+const CACHE = "flysim-cache-v17";
 const CORE_ASSETS = [
-  "./assets/video/intro.mp4",
+  "./intro.mp4",
+"./assets/video/intro.mp4",
 "./",
   "./index.html",
   "./css/app.css",
