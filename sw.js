@@ -2,12 +2,12 @@
 // BUILD_2026-02-12_STAGE3_02
 // Generated: 2026-02-12 15:48:33
 
-const CACHE = "flysim-cache-v14";
+const CACHE = "flysim-cache-v16";
 const CORE_ASSETS = [
-  "./",
+  "./assets/video/intro.mp4",
+"./",
   "./index.html",
   "./css/app.css",
-
   "./js/store.js",
   "./js/data.js",
   "./js/economy.js",
@@ -27,30 +27,29 @@ const CORE_ASSETS = [
   "./js/sound.js",
   "./js/reports.js",
   "./js/build_info.js",
-    "./js/picker.js",
-"./js/ux.js",
-
+  "./js/picker.js",
+  "./js/ux.js",
   "./assets/images/logo.png",
   "./assets/images/map_bg.png",
   "./assets/images/cover.png",
   "./assets/avatars/player.svg",
   "./assets/aircraft/models/README.txt",
   "./assets/aircraft/models/placeholder.png",
-
   "./favicon.ico",
   "./manifest.webmanifest",
   "./manifest.json",
-  "./BUILD.txt"  "./assets/aircraft/models/placeholder.svg",  "./assets/aircraft/models/A320.png",  "./assets/aircraft/models/A320NEO.png",  "./assets/aircraft/models/A321.png",  "./assets/aircraft/models/B738.png",  "./assets/aircraft/models/B737MAX.png",  "./assets/aircraft/models/E195E2.png",  "./assets/aircraft/models/ATR72.png",  "./assets/aircraft/models/A330.png",  "./assets/aircraft/models/B787.png",
-
-
-
-
-
-
-
-
-
-
+  "./BUILD.txt",
+  "./assets/aircraft/models/placeholder.svg",
+  "./assets/aircraft/models/A320.png",
+  "./assets/aircraft/models/A320NEO.png",
+  "./assets/aircraft/models/A321.png",
+  "./assets/aircraft/models/B738.png",
+  "./assets/aircraft/models/B737MAX.png",
+  "./assets/aircraft/models/E195E2.png",
+  "./assets/aircraft/models/ATR72.png",
+  "./assets/aircraft/models/A330.png",
+  "./assets/aircraft/models/B787.png",
+  "./assets/data/airports_extra.json",
 ];
 
 self.addEventListener("install", (event) => {

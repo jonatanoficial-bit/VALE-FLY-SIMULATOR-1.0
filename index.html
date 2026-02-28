@@ -12,6 +12,16 @@
   <link rel="stylesheet" href="css/app.css" />
 </head>
 <body>
+  <!-- Intro Video Overlay -->
+  <div id="introOverlay" class="introOverlay" aria-hidden="false">
+    <video id="introVideo" class="introVideo" preload="auto" playsinline muted>
+      <source src="./assets/video/intro.mp4" type="video/mp4">
+    </video>
+    <div class="introControls">
+      <button id="introSkip" class="btn introSkip" type="button">Pular</button>
+    </div>
+  </div>
+
   <header id="topbar">
     <div class="brand">
       <img src="assets/images/logo.png" alt="Logo" />
@@ -219,5 +229,64 @@
   </div>
 
   <script src="./js/picker.js"></script>
+
+  <script>
+    // Intro video: plays once per session unless user skips.
+    (function(){
+      function initIntroVideo(){
+        const overlay = document.getElementById('introOverlay');
+        const video = document.getElementById('introVideo');
+        const skip = document.getElementById('introSkip');
+        if(!overlay || !video) return;
+
+        // Hide game until intro ends
+        document.documentElement.classList.add('intro-playing');
+
+        function finish(){
+          overlay.classList.add('hide');
+          overlay.setAttribute('aria-hidden','true');
+          document.documentElement.classList.remove('intro-playing');
+          try{ sessionStorage.setItem('introPlayed','1'); }catch(_){}
+          setTimeout(()=> overlay.remove(), 600);
+        }
+
+        // Allow skip
+        skip?.addEventListener('click', ()=>{
+          try{ video.pause(); }catch(_){}
+          finish();
+        });
+
+        video.addEventListener('ended', finish);
+        video.addEventListener('error', finish);
+
+        // Play only once per session
+        let played = false;
+        try{ played = sessionStorage.getItem('introPlayed') === '1'; }catch(_){}
+        if(played){
+          finish();
+          return;
+        }
+
+        // Autoplay policy: muted + playsinline, try to play; if blocked, show tap-to-play hint
+        const tryPlay = ()=> video.play().catch(()=> {
+          overlay.classList.add('needsTap');
+          overlay.addEventListener('click', ()=> {
+            overlay.classList.remove('needsTap');
+            video.play().catch(()=>{});
+          }, { once:true });
+        });
+
+        // Start slightly delayed to ensure layout stable
+        setTimeout(tryPlay, 120);
+      }
+
+      if(document.readyState === 'loading'){
+        document.addEventListener('DOMContentLoaded', initIntroVideo);
+      } else {
+        initIntroVideo();
+      }
+    })();
+  </script>
 </body>
+
 </html>
