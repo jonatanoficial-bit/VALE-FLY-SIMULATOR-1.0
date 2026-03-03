@@ -8,32 +8,46 @@
   window.flightData.company ||= { cash: 0, reputation01: 0.5, day: 1 };
   window.flightData.airports ||= [];
 
-  // Stage 5 — load extra airports dataset (offline bundled)
+    // Stage 5 — load extra airports dataset (offline bundled)
   (async ()=>{
     try{
       const resp = await fetch("./assets/data/airports_extra.json", { cache: "no-store" });
-      if(!resp.ok) return;
+      if(!resp.ok) throw new Error("airports_extra.json não encontrado");
       const j = await resp.json();
       const extra = Array.isArray(j.airports) ? j.airports : [];
       if(!extra.length) return;
 
-      const s = window.gameState || window.flightData;
-      s.airports ||= [];
-      const existing = new Set(s.airports.map(a=>a.code));
-      for(const a of extra){
-        if(!a || !a.code) continue;
-        if(!existing.has(a.code)){
-          s.airports.push(a);
-          existing.add(a.code);
+      // ✅ Merge no estado principal do jogo (save)
+      const state = window.gameState || window.DEFAULT_GAME_STATE;
+      if(state){
+        state.airports = Array.isArray(state.airports) ? state.airports : [];
+        const map = new Map(state.airports.map(a => [a.code, a]));
+        for(const ap of extra){
+          if(ap && ap.code && !map.has(ap.code)){
+            map.set(ap.code, ap);
+          }
+        }
+        state.airports = Array.from(map.values());
+        try{ FlySimStore.save(state); }catch(_){}
+      }
+
+      // ✅ Mantém também em flightData (usado por módulos de mapa/UI)
+      window.flightData.airports = Array.isArray(window.flightData.airports) ? window.flightData.airports : [];
+      const map2 = new Map(window.flightData.airports.map(a => [a.code, a]));
+      for(const ap of extra){
+        if(ap && ap.code && !map2.has(ap.code)){
+          map2.set(ap.code, ap);
         }
       }
-      // persist merge once
-      FlySimStore.save(s);
-      window.dispatchEvent(new Event("game-updated"));
+      window.flightData.airports = Array.from(map2.values());
+
+      try{ window.dispatchEvent(new Event("game-updated")); }catch(_){}
+      try{ window.MapModule?.render?.(); }catch(_){}
     }catch(e){
-      console.warn("extra airports load failed", e);
+      console.warn("Falha ao carregar/mesclar airports_extra:", e);
     }
   })();
+
 
   window.flightData.aircraftCatalog ||= [];
   window.flightData.fleet ||= [];

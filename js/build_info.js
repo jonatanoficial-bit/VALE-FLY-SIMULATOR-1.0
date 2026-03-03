@@ -1,12 +1,12 @@
-// BUILD_2026-02-28_INTRO_VIDEO_03
-// Generated: 2026-02-28 15:45:23
+// BUILD_2026-03-03_AIRPORTS_FIX_01
+// Generated: 2026-03-03 09:51:07
 
 window.__BUILD__ = {
-  id: "BUILD_2026-02-28_INTRO_VIDEO_03",
-  generatedAt: "2026-02-28 15:45:23"
+  id: "BUILD_2026-03-03_AIRPORTS_FIX_01",
+  generatedAt: "2026-03-03 09:51:07"
 };
 
 (function(){
   const tag = document.getElementById("buildTag");
-  if(tag) tag.textContent = `(BUILD_2026-02-28_INTRO_VIDEO_03 | 2026-02-28 15:45:23)`;
+  if(tag) tag.textContent = `(BUILD_2026-03-03_AIRPORTS_FIX_01 | 2026-03-03 09:51:07)`;
 })();

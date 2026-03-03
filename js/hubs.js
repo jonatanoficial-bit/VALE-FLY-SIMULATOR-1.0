@@ -19,7 +19,8 @@
 
   function getSlotsForAirport(state, code){
     ensure(state);
-    const ap = state.airports.find(a=>a.code===code);
+    const list = (window.ProgressionModule?.getAvailableAirports?.(state) || state.airports || []);
+    const ap = list.find(a=>a.code===code);
     if(!ap) return 0;
     const base = airportSlotsBase(ap);
     const hub = getHub(state, code);
@@ -41,7 +42,8 @@
 
   function createHub(state, code){
     ensure(state);
-    const ap = state.airports.find(a=>a.code===code);
+    const list = (window.ProgressionModule?.getAvailableAirports?.(state) || state.airports || []);
+    const ap = list.find(a=>a.code===code);
     if(!ap) throw new Error("Aeroporto inválido");
     if(state.hubs[code]) throw new Error("Já é HUB");
     const cost = hubCost(ap);
