@@ -124,7 +124,34 @@ function render(){
     }
 
     if(anims.length) startAnimations();
-  }
+  
+    // Active flights (time-based)
+    try{
+      const s = window.gameState || d;
+      if(s && Array.isArray(s.activeFlights) && s.activeFlights.length){
+        TimeSim?.ensureClock?.(s);
+        const now = s.clock?.minuteOfDay ?? 0;
+
+        for(const f of s.activeFlights){
+          const a = d.airports.find(x=>x.code===f.from);
+          const b = d.airports.find(x=>x.code===f.to);
+          if(!a||!b) continue;
+
+          const dep = f.depMinute ?? 0;
+          const arr = f.arrMinute ?? (dep+60);
+          const denom = Math.max(1, (arr - dep));
+          let t = (now - dep) / denom;
+          t = Math.max(0, Math.min(1, t));
+
+          const lat = a.lat + (b.lat - a.lat)*t;
+          const lon = a.lon + (b.lon - a.lon)*t;
+
+          const mk = createPlaneMarker([lat,lon]);
+          mk.addTo(planeLayer);
+        }
+      }
+    }catch(e){ console.warn(e); }
+}
 
   return { init, render };
 })();

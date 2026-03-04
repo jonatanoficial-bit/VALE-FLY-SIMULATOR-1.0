@@ -259,3 +259,30 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-famil
 html.intro-playing body > *:not(#introOverlay){
   visibility:hidden;
 }
+
+
+/* ===== Time Simulation Bar ===== */
+.timeBar{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:12px;
+  background:rgba(0,0,0,.25);
+  margin-right:10px;
+}
+#clockLabel{
+  font-weight:900;
+  letter-spacing:.5px;
+  opacity:.95;
+}
+.timeBtn{
+  padding:6px 10px;
+  border-radius:10px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  color:#fff;
+  font-weight:900;
+}
+.timeBtn:active{ transform: scale(0.98); }

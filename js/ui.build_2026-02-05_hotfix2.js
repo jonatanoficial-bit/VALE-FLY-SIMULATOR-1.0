@@ -55,6 +55,19 @@ function aircraftImgTag(modelId){
       const sum = EconomyModule.advanceDay(window.gameState);
       FlySimStore.save(window.gameState);
       render();
+
+    // ===== Time Simulation (1x/2x/3x/4x) =====
+    try{
+      TimeSim.ensureClock(window.gameState);
+      document.querySelectorAll(".timeBtn").forEach(btn=>{
+        btn.addEventListener("click", ()=> TimeSim.setSpeed(btn.dataset.speed));
+      });
+      if(!window.__timeSimStarted){
+        window.__timeSimStarted = true;
+        TimeSim.start();
+      }
+    }catch(e){ console.warn(e); }
+
       MapModule.render();
       return sum;
     }

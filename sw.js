@@ -2,9 +2,11 @@
 // BUILD_2026-02-12_STAGE3_02
 // Generated: 2026-02-12 15:48:33
 
-const CACHE = "flysim-cache-v17";
+const CACHE = "flysim-cache-v18";
 const CORE_ASSETS = [
-  "./intro.mp4",
+  "./js/flight_scheduler.js",
+"./js/time_sim.js",
+"./intro.mp4",
 "./assets/video/intro.mp4",
 "./",
   "./index.html",
