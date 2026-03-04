@@ -310,6 +310,16 @@ if(buyAllianceBtn){
 
   function render(){
     const s = window.gameState;
+
+    // Clock label (tempo do jogo)
+    try{
+      TimeSim.ensureClock(s);
+      const lbl = document.getElementById("clockLabel");
+      if(lbl && s && s.clock){
+        lbl.textContent = TimeSim.fmt(s.clock.minuteOfDay) + " • Dia " + (s.company?.day || 1);
+      }
+    }catch(_){}
+
     document.getElementById("clockText").textContent = s.company.day;
     document.getElementById("cashText").textContent = money(s.company.cash);
     document.getElementById("repText").textContent = Math.round(s.company.reputation01*100) + "%";

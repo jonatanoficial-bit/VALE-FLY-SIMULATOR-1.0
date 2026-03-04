@@ -3,7 +3,18 @@
   const LEVEL_XP = [0, 250, 700, 1400, 2400, 3800, 5600, 7800, 10400, 13400, 17000];
 
   function ensure(state){
-    state.progress = state.progress || { level: 1, xp: 0, unlockedTiers: ["mid"], unlockedModels: [] };
+    state.progress = state.progress || { level: 1, xp: 0, unlockedTiers: ["regional","mid","major","mega"], unlockedModels: [] };
+
+  // ✅ DEV: liberar TODOS aeroportos por padrão (evita selects vazios)
+  if(state.progress.unlockAllAirports === undefined) state.progress.unlockAllAirports = true;
+  state.progress.unlockedAirports = state.progress.unlockedAirports || [];
+
+  // garante tiers completos
+  if(!state.progress.unlockedTiers || !state.progress.unlockedTiers.length){
+    state.progress.unlockedTiers = ["regional","mid","major","mega"];
+  }
+  if(state.progress.level < 1) state.progress.level = 1;
+
     if(!state.progress.unlockedTiers?.length) state.progress.unlockedTiers = ["mid"];
     if(state.progress.level < 1) state.progress.level = 1;
     state.hubs = state.hubs || {}; // code -> { level, slotsBonus, demandBonus01 }
